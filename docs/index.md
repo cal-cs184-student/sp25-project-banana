@@ -5,7 +5,6 @@ title: Proposal
 
 # Proposal
 
-
 ## Title, Summary and Team Members
 Provide us a descriptive title, 2-3 sentences that summarize your project, and list your four team members.
 Please include your project name as the title of your proposal: this should be short, memorable, and relevant to the project you’re embarking on!
