@@ -4,6 +4,7 @@ title: Proposal
 ---
 
 # Proposal
+> Curtis Hu, Ashvin Verma, Toben Isaiah Main, Viktor ...
 
 ## Title, Summary and Team Members
 Provide us a descriptive title, 2-3 sentences that summarize your project, and list your four team members.
@@ -22,5 +23,18 @@ You should break this section into two parts: (1) what you plan to deliver, and 
 ## Schedule
 In this section you should organize and plan the tasks and subtasks that your team will execute. Since presentations are ~4 weeks from the due-date of the proposal, you should include a set of tasks for every week.
 
+- Week 1: Familiarize ourselves with the literature.
+- Week 2: Work 
+- Week 3: Work
+- Week 4: Finish rendering and results. Get ready to present results. If time permits, make a WebGL interactive version.
+
 ## Resources
 List what resources, e.g. books, papers and/or online resources that are references for your project. List the computing platform, hardware and software resources that you will use for your project. You have a wide latitude here to use what you have access to, but be aware that you will have to support and trouble-shoot on your platform yourselves. If you are starting from an existing piece of code or system, describe and provide a pointer to it here.
+
+- Hartle
+- Kip
+
+Computing Platforms: MacOS Sequioa, Windows 11
+
+Software Libraries: OpenGL, GLFW, GLEW, ImGui, dneg.com
+
