@@ -9,9 +9,9 @@ github_username:  jekyll
 
 plugins:
   - jekyll-feed
-  # - jekyll-remote-theme
+  - jekyll-remote-theme
 
-theme: jekyll-theme-cayman
+remote-theme: just-the-docs/just-the-docs
 
 # remote_theme: just-the-docs/just-the-docs@v0.5.2
 # Exclude from processing.
