@@ -42,6 +42,7 @@ jobs:
           gem "jekyll-theme-cayman"
           gem "jekyll-remote-theme"
           gem "jekyll-include-cache"
+          gem "just-the-docs"
 
           group :jekyll_plugins do
             gem "jekyll-feed"
