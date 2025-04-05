@@ -41,6 +41,7 @@ jobs:
           # If using Cayman theme
           gem "jekyll-theme-cayman"
           gem "jekyll-remote-theme"
+          gem "jekyll-include-cache"
 
           group :jekyll_plugins do
             gem "jekyll-feed"

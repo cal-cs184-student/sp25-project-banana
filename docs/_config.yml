@@ -10,6 +10,7 @@ github_username:  jekyll
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
+  - jekyll-include-cache
 
 remote-theme: just-the-docs/just-the-docs
 
