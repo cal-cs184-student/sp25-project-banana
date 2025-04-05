@@ -27,6 +27,8 @@ jobs:
         with:
           ruby-version: '3.1'
           bundler-cache: true
+      - name: Bundle Install
+        run: bundle install
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
