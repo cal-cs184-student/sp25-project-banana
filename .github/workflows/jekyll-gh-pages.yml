@@ -32,10 +32,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: build_and_deploy
     steps:
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: _site
-          branch: gh-pages  # The branch where your site will be deployed
+        id: deployment
+        uses: actions/deploy-pages@v4
