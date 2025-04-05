@@ -31,8 +31,8 @@ In this section you should organize and plan the tasks and subtasks that your te
 ## Resources
 List what resources, e.g. books, papers and/or online resources that are references for your project. List the computing platform, hardware and software resources that you will use for your project. You have a wide latitude here to use what you have access to, but be aware that you will have to support and trouble-shoot on your platform yourselves. If you are starting from an existing piece of code or system, describe and provide a pointer to it here.
 
-- Hartle
-- Kip
+- https://larswander.com/writing/spectral-ray-tracing/
+- EFFICIENT SPECTRAL RENDERING ON THE GPU FOR PREDICTIVE RENDERING David Murray,1 Alban Fichet,1 and Romain Pacanowski1,2 Institut d’Optique Graduate School, CNRS INRIA
 
 Computing Platforms: MacOS Sequioa, Windows 11
 
