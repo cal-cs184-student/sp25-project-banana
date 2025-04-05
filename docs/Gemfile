@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 
 gem "jekyll", "~> 4.3"  # Use latest Jekyll version
+gem "just-the-docs"
 
 # Add any other plugins you need
 group :jekyll_plugins do
