@@ -28,6 +28,8 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2' # Updated to a newer Ruby version
+          source: ./docs
+          ruby-version: '3.1'
           bundler-cache: true
 
       - name: Update Gemfile
@@ -61,6 +63,21 @@ jobs:
   deploy:
     environment:
       name: Deploy
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./docs
+          destination: ./_site
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
+  deploy:
+    environment:
+      name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
