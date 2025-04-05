@@ -3,16 +3,16 @@ layout: home
 title: Proposal
 ---
 
-# Proposal
-> Curtis Hu, Ashvin Verma, Toben Isaiah Main, Viktor ...
+# Insert Title
+> Curtis Hu, Ashvin Verma, Toben Main, Viktor ...
 
-## Title, Summary and Team Members
+## Summary
 Provide us a descriptive title, 2-3 sentences that summarize your project, and list your four team members.
 Please include your project name as the title of your proposal: this should be short, memorable, and relevant to the project you’re embarking on!
 
 ## Problem Description
 Here you should provide the context for your idea. Describe the problem that you are trying to solve, why it is important, where it is challenging. Give us a general idea on how you are going to solve it.
-Goals and Deliverables
+## Goals and Deliverables
 This is the most important part of your proposal. You should carefully think through what you are trying to accomplish, what results you are going for, and why you think you can accomplish those goals. For example:
 Since this is a graphics class you will likely define the kind of images you will create (e.g. including a photo of a new lighting effect you will simulate).
 If you are working on an interactive system, describe what demo you will create.
@@ -33,6 +33,8 @@ List what resources, e.g. books, papers and/or online resources that are referen
 
 - https://larswander.com/writing/spectral-ray-tracing/
 - EFFICIENT SPECTRAL RENDERING ON THE GPU FOR PREDICTIVE RENDERING David Murray,1 Alban Fichet,1 and Romain Pacanowski1,2 Institut d’Optique Graduate School, CNRS INRIA
+- https://www.dgp.toronto.edu/~nmorris/CSC2530/Project/morris.pdf
+- https://www-users.cse.umn.edu/~gmeyer/papers/gondek-meyer-siggraph-1994.pdf
 
 Computing Platforms: MacOS Sequioa, Windows 11
 
