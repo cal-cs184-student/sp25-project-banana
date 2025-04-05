@@ -1,12 +1,21 @@
-name: Build and Deploy Jekyll Site
+name: Deploy Jekyll site to Pages
 
 on:
   push:
-    branches:
-      - main  # or master, depending on your default branch
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  build_and_deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,14 +25,34 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          source: ./docs
-          ruby-version: '3.1'
+          ruby-version: '3.2'
           bundler-cache: true
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./docs
-          destination: ./_site
+
+      - name: Update Gemfile
+        run: |
+          cd ./docs
+          # Create or update Gemfile to use specific Jekyll version
+          cat > Gemfile << EOF
+          source "https://rubygems.org"
+          
+          gem "jekyll", "~> 4.3.4"
+          gem "webrick", "~> 1.9.1"
+          
+          # If using Cayman theme
+          gem "jekyll-theme-cayman"
+          
+          group :jekyll_plugins do
+            gem "jekyll-feed"
+            gem "jekyll-seo-tag"
+          end
+          EOF
+      
+      - name: Install dependencies and build
+        run: |
+          cd ./docs
+          bundle install
+          bundle exec jekyll build --destination ../_site
+      
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
