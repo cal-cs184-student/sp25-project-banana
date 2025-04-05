@@ -40,10 +40,8 @@ jobs:
           
           # If using Cayman theme
           gem "jekyll-theme-cayman"
-
           gem "jekyll-remote-theme"
 
-          
           group :jekyll_plugins do
             gem "jekyll-feed"
             gem "jekyll-seo-tag"
@@ -64,7 +62,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build_and_deploy
+    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
