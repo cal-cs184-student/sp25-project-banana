@@ -15,7 +15,8 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
-        working-directory: ./docs
+        env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
+          BUNDLE_GEMFILE: ${{ github.workspace }}/docs/Gemfile
         with:
           ruby-version: '3.1'
           bundler-cache: true
