@@ -9,15 +9,9 @@ github_username:  jekyll
 
 plugins:
   - jekyll-feed
-  # - jekyll-remote-theme
 
-<<<<<<< HEAD
 theme: just-the-docs
 
-# remote_theme: just-the-docs/just-the-docs@v0.5.2
-=======
-theme: jekyll-theme-cayman
->>>>>>> 255d6ff8409c879c062edfac68fd947adbc3924f
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to

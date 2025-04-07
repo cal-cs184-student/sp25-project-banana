@@ -6,7 +6,7 @@ on:
       - main  # or master, depending on your default branch
 
 jobs:
-  build_and_deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,7 +35,5 @@ jobs:
     needs: build
     steps:
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: _site
-          branch: gh-pages  # The branch where your site will be deployed
+        id: deployment
+        uses: actions/deploy-pages@v4
