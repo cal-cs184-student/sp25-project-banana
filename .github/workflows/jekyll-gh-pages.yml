@@ -3,7 +3,7 @@ name: Build and Deploy Jekyll Site
 on:
   push:
     branches:
-      - gh-pages  # or master, depending on your default branch
+      - main  # or master, depending on your default branch
 
 jobs:
   build:
