@@ -2,5 +2,3 @@
 layout: page
 permalink: /about/
 ---
-
-...

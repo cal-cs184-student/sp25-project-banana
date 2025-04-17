@@ -1,6 +1,7 @@
 ---
 layout: home
 title: Proposal
+nav_order: 1
 ---
 
 # Spectra
@@ -20,6 +21,9 @@ Spectral rendering is important for simulating these physical phenomena because 
 - Spectral Light Representation: Implement a method for representing and sampling light spectra instead of just three RGB channels. This could involve Monte Carlo sampling of individual wavelengths across the visible spectrum or using a fixed spectral basis. The aim is to ensure the renderer can handle continuous wavelength data for light sources and surfaces. <br>
 - Thin-Film Interference Model: Implement thin-film interference effects using physics-based optics models. This includes using Fresnel equations for reflectance at interfaces and accounting for the phase shifts that occur when light waves reflect within a thin film layer. By combining reflections from the top and bottom surfaces of a film with the appropriate phase difference, the renderer will simulate constructive and destructive interference at different wavelengths. <br>
 - Rendered Demonstrations: Output a set of example images demonstrating the effects. For instance, render a scene with a soap bubble under various lighting and viewing angles, showing the changing iridescent colors. These images will serve as validation that our spectral rendering and thin-film interference model are working correctly and producing visually convincing results. <br>
+
+<img src="assets/soap_bubble.JPG" alt="soap bubble" />
+<img src="assets/soap_bubble2.JPG" alt="soap bubble" />
 
 2. Stretch Goal (What we hope to deliver): <br>
 - Extended Phenomena: Extend the spectral renderer to handle additional phenomena beyond soap bubbles. Examples include rendering oil slicks on water (another thin-film case with spatially varying thickness), prism dispersion (splitting white light into a spectrum), or rainbow caustics through dispersive optics. This will demonstrate the generality of our spectral approach for various wavelength-dependent effects. <br>
