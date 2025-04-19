@@ -80,26 +80,22 @@ PathTracer::estimate_direct_lighting_hemisphere(const Ray &r,
 
 
   for (int j = 0; j < num_samples; j++) {
-	  // incoming light sampled uniform over hemisphere
-      // in object space (upper hemisphere)
-	  Vector3D w_j = hemisphereSampler->get_sample();
-	  w_j = (o2w * w_j).unit(); // transform to world space
+      Vector3D* w_j;
+	  double* pdf; // p(w_j)
 
       // f_r(p, w_j -> w_r)
-	  Vector3D f_r = isect.bsdf->f(w_out, -w_j);
+	  Vector3D f_r = isect.bsdf->sample_f(w_out, w_j, pdf);
 
       // Light from w_j direction
 	  Intersection* light_j = new Intersection();
-	  Ray* ray_j = new Ray(hit_p, w_j.unit());
+	  Ray* ray_j = new Ray(hit_p, (*w_j).unit());
       ray_j->min_t = EPS_F;
       if (!bvh->intersect(*ray_j, light_j)) continue;
       Vector3D L_i = light_j->bsdf->get_emission();
 
-      L_out += f_r * L_i * dot(w_j, isect.n);
+      L_out += f_r * L_i * dot(*w_j, isect.n) / *pdf;
   }
 
-  double p_w_j = 1 / (2*PI); // 1/sr
-  L_out /= p_w_j;
   L_out /= num_samples;
 
   return L_out;
