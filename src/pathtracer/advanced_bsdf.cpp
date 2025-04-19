@@ -15,7 +15,7 @@ namespace CGL {
 // Mirror BSDF //
 
 Vector3D MirrorBSDF::f(const Vector3D wo, const Vector3D wi) {
-  return Vector3D();
+  return wo;
 }
 
 Vector3D MirrorBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
@@ -23,7 +23,7 @@ Vector3D MirrorBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
   // TODO:
   // Implement MirrorBSDF
   
-  return Vector3D();
+  return f(wo, *wi);
 }
 
 void MirrorBSDF::render_debugger_node()
