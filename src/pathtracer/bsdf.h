@@ -287,6 +287,29 @@ class EmissionBSDF : public BSDF {
 
 }; // class EmissionBSDF
 
+/**
+ * Spectral BSDF.
+ */
+class SpectralBSDF : public BSDF {
+ public:
+
+  SpectralBSDF(const Vector3D transmittance, const Vector3D reflectance,
+            double roughness, double ior) :
+    transmittance(transmittance), reflectance(reflectance),
+    roughness(roughness), ior(ior) { }
+
+  Vector3D f(const Vector3D wo, const Vector3D wi);
+  Vector3D sample_f(const Vector3D wo, Vector3D* wi, double* pdf);
+  Vector3D get_emission() const { return Vector3D(); }
+
+ private:
+
+  double ior;
+  Vector3D reflectance;
+  Vector3D transmittance;
+
+}; // class SpectralBSDF
+
 }  // namespace CGL
 
 #endif  // CGL_STATICSCENE_BSDF_H
