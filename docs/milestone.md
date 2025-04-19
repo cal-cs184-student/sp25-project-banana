@@ -27,3 +27,5 @@ spectral class
 
 - https://www.dawsondo.net/projects/spectral
 - https://destinyluong.github.io/CS184Final/
+- https://dl.icdst.org/pdfs/files3/610aca40599a0f42ecaa2b20bb95850c.pdf
+- https://jcgt.org/published/0002/02/01/

@@ -120,7 +120,7 @@ void RefractionBSDF::render_debugger_node()
 // Glass BSDF //
 
 Vector3D GlassBSDF::f(const Vector3D wo, const Vector3D wi) {
-  return ;
+  return Vector3D(0);
 }
 
 Vector3D GlassBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
@@ -195,11 +195,59 @@ void SpectralBSDF::render_debugger_node()
   }
 }
 
+double SpectralBSDF::black_body_spd(double lambda) {
+	  lambda = lambda * 1e-9; // convert nm to m
+	  double K = 2 * PLANCK_CONSTANT * SPEED_OF_LIGHT * SPEED_OF_LIGHT / pow(lambda, 5);
+      double T = 500;
+	  double exp_term = exp(PLANCK_CONSTANT * SPEED_OF_LIGHT / (lambda * BOLTZMANN_CONSTANT * T));
+	  return K / (exp_term - 1);
+}
+
+double SpectralBSDF::custom_spd(double lambda) { 
+  // assume spd is ordered
+	for (int i = 0; i < spd.size(); i++) {
+		if (lambda < spd[i]) {
+			return spd[i];
+		}
+	}
+	return spd[spd.size() - 1];
+};
+
 Vector3D SpectralBSDF::f(const Vector3D wo, const Vector3D wi) {
-	return Vector3D();
+	return ;
 }
 
 Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
+
+	// Fresnel coefficient 
+	// Fundamentals of Computer Graphics page 305
+
+	double R0 = powf((ior - 1) / (ior + 1), 2);
+	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
+
+    if (coin_flip(R)) {
+        *pdf = R;
+		reflect(wo, wi);
+		return reflectance * sample_lambda();
+    }
+
+    *pdf = 1 - R;
+	refract(wo, wi, ior);
+  return transmittance * sample_lambda();
+}
+
+Vector3D SpectralBSDF::sample_lambda() {
+    int N = 10;
+    Vector3D f;
+    for (int i = 0; i < N; i++) {
+    	double lambda = random_uniform();
+		f += uniform_spd(lambda) * to_xyz(lambda);
+    }
+    f /= N;
+	return f;
+}
+
+Vector3D SpectralBSDF::to_xyz(double lambda) {
     return Vector3D();
 }
 
