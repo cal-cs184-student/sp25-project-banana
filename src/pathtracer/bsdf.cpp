@@ -57,7 +57,7 @@ Vector3D DiffuseBSDF::f(const Vector3D wo, const Vector3D wi) {
     // Diffuse lambertian is independent of wo, wi
 	// Other BSDF will be dependent on wo, wi
     // I believe this is right (over a hemisphere)
-  return reflectance/(PI);
+  return reflectance;
 }
 
 /**
@@ -72,7 +72,7 @@ Vector3D DiffuseBSDF::sample_f(const Vector3D wo, Vector3D *wi, double *pdf) {
   // You can use the `f` function. The reference solution only takes two lines.
 
     *wi = sampler.get_sample(pdf);
-    *pdf = wi->z / (PI); // uniform sampling over hemisphere
+    *pdf = abs_cos_theta(*wi) / PI; // uniform sampling over hemisphere
     return f(wo, *wi);
 }
 
@@ -89,7 +89,7 @@ void DiffuseBSDF::render_debugger_node()
  * Evalutate Emission BSDF (Light Source)
  */
 Vector3D EmissionBSDF::f(const Vector3D wo, const Vector3D wi) {
-  return Vector3D();
+  return Vector3D(1.0);
 }
 
 /**
@@ -98,7 +98,7 @@ Vector3D EmissionBSDF::f(const Vector3D wo, const Vector3D wi) {
 Vector3D EmissionBSDF::sample_f(const Vector3D wo, Vector3D *wi, double *pdf) {
   *pdf = 1.0 / PI;
   *wi = sampler.get_sample(pdf);
-  return Vector3D();
+  return f(wo, *wi);
 }
 
 void EmissionBSDF::render_debugger_node()
