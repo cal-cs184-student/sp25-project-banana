@@ -10,6 +10,9 @@ nav_order: 2
 [insert video here]
 [insert slides here]
 
+## Theory
+
+spectral class
 
 ## Progress
 
@@ -18,3 +21,9 @@ nav_order: 2
 ## Results
 
 ## Reflection
+
+
+### References
+
+- https://www.dawsondo.net/projects/spectral
+- https://destinyluong.github.io/CS184Final/

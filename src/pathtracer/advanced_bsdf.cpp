@@ -168,4 +168,7 @@ bool BSDF::refract(const Vector3D wo, Vector3D* wi, double ior) {
 
 }
 
+// Sample Spectral Distribution Function
+void BSDF::
+
 } // namespace CGL
