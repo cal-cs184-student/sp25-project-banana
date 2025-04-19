@@ -180,12 +180,12 @@ void SpectralBSDF::render_debugger_node()
   }
 }
 
-void SpectralBSDF::f() {
-
+Vector3D SpectralBSDF::f(const Vector3D wo, const Vector3D wi) {
+	return Vector3D();
 }
 
-void SpectralBSDF::sample_f() {
-
+Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
+    return Vector3D();
 }
 
 
