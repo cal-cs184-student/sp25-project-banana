@@ -169,6 +169,17 @@ bool BSDF::refract(const Vector3D wo, Vector3D* wi, double ior) {
 }
 
 // Spectral Distribution Function
+void SpectralBSDF::render_debugger_node()
+{
+  if (ImGui::TreeNode(this, "Refraction BSDF"))
+  {
+    DragDouble3("Reflectance", &reflectance[0], 0.005);
+    DragDouble3("Transmittance", &transmittance[0], 0.005);
+    DragDouble("ior", &ior, 0.005);
+    ImGui::TreePop();
+  }
+}
+
 void SpectralBSDF::f() {
 
 }

@@ -302,6 +302,8 @@ class SpectralBSDF : public BSDF {
   Vector3D sample_f(const Vector3D wo, Vector3D* wi, double* pdf);
   Vector3D get_emission() const { return Vector3D(); }
 
+  void render_debugger_node();
+
  private:
 
   double ior;
