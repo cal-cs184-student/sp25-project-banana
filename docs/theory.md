@@ -40,7 +40,11 @@ $$
 
 (Fundamentals of Computer Graphics pg. 304)
 
+#### Reflection - Fresnel and Schlick
+Rays not only refract, but they reflect in a thin film model.
 
+To find the direction the ray reflects in, we simply take:
+R &= I − 2 \times (I \times N) \times N
 
 ### Soap Bubbles
 #### Mesh generation and physics
