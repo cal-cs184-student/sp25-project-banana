@@ -114,6 +114,7 @@ class BSDF {
    * Refraction helper
    */
   virtual bool refract(const Vector3D wo, Vector3D* wi, double ior);
+  virtual bool refract(const Vector3D wo, Vector3D* wi, double ior_o, double ior_i);
 
   const HDRImageBuffer* reflectanceMap;
   const HDRImageBuffer* normalMap;

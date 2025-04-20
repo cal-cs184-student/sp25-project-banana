@@ -164,6 +164,9 @@ void BSDF::reflect(const Vector3D wo, Vector3D* wi) {
 }
 
 bool BSDF::refract(const Vector3D wo, Vector3D* wi, double ior) {
+    return refract(wo, wi, ior, 1);
+}
+bool BSDF::refract(const Vector3D wo, Vector3D* wi, double ior_o, double ior_i) {
 
   // TODO:
   // Use Snell's Law to refract wo surface and store result ray in wi.
@@ -171,13 +174,13 @@ bool BSDF::refract(const Vector3D wo, Vector3D* wi, double ior) {
   // and true otherwise. When dot(wo,n) is positive, then wo corresponds to a
   // ray entering the surface through vacuum.
 
-    if (sin_theta2(wo) > ior*ior) {
+    if (ior_o*ior_o*sin_theta2(wo) > ior_i*ior_i) {
         return false;
     }
 
 	Vector3D N = Vector3D(0, 0, 1);
-	*wi = ior * cross(N, cross(-N, wo))
-       - N * sqrt(1 - ior * ior * sin_theta2(wo));
+	*wi = ior_o/ior_i * cross(N, cross(-N, wo))
+       - N * sqrt(1 - (ior_o*ior_o/(ior_i*ior_i)) * sin_theta2(wo));
 
   return true;
 

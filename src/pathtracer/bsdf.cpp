@@ -72,7 +72,7 @@ Vector3D DiffuseBSDF::sample_f(const Vector3D wo, Vector3D *wi, double *pdf) {
   // You can use the `f` function. The reference solution only takes two lines.
 
     *wi = sampler.get_sample(pdf);
-    *pdf = abs_cos_theta(wo) / PI; // uniform sampling over hemisphere
+    *pdf = abs_cos_theta(wo) / PI; // cosine weighted sampling over hemisphere
     return f(wo, *wi);
 }
 
