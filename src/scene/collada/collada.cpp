@@ -913,6 +913,16 @@ void ColladaParser::parse_material ( XMLElement* xml, MaterialInfo& material ) {
           float ior = atof(e_ior->GetText());
           BSDF* bsdf = new GlassBSDF(transmittance, reflectance, roughness, ior);
           material.bsdf = bsdf;
+        } else if (type == "thinfilm") {
+          XMLElement *e_transmittance  = get_element(e_bsdf, "transmittance");
+          XMLElement *e_reflectance  = get_element(e_bsdf, "reflectance");
+          XMLElement *e_roughness = get_element(e_bsdf, "roughness");
+          XMLElement *e_ior = get_element(e_bsdf, "ior");
+          Vector3D transmittance = spectrum_from_string(string(e_transmittance->GetText()));
+          Vector3D reflectance = spectrum_from_string(string(e_reflectance->GetText()));
+          float roughness = atof(e_roughness->GetText());
+          float ior = atof(e_ior->GetText());
+          BSDF* bsdf = new SpectralBSDF(transmittance, reflectance, roughness, ior);
         }
         e_bsdf = e_bsdf->NextSiblingElement();
       }

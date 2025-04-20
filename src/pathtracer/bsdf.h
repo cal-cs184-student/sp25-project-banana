@@ -304,6 +304,7 @@ class SpectralBSDF : public BSDF {
   Vector3D f(const Vector3D wo, const Vector3D wi);
   Vector3D sample_f(const Vector3D wo, Vector3D* wi, double* pdf);
   Vector3D get_emission() const { return Vector3D(); };
+  bool is_delta() const { return false; };
 
   double uniform_spd(double lambda) const { return 1 / (700 - 380); };
   double black_body_spd(double lambda);

@@ -214,7 +214,7 @@ double SpectralBSDF::custom_spd(double lambda) {
 };
 
 Vector3D SpectralBSDF::f(const Vector3D wo, const Vector3D wi) {
-	return ;
+	return Vector3D(0);
 }
 
 Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
@@ -250,6 +250,7 @@ Vector3D SpectralBSDF::sample_lambda() {
 Vector3D SpectralBSDF::to_xyz(double lambda) {
     return Vector3D();
 }
+
 
 
 } // namespace CGL
