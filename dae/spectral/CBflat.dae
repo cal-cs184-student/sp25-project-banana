@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 4.4.0 commit date:2025-03-17, commit time:17:00, hash:05377985c527</authoring_tool>
     </contributor>
-    <created>2025-04-19T14:51:53</created>
-    <modified>2025-04-19T14:51:53</modified>
+    <created>2025-04-20T12:42:17</created>
+    <modified>2025-04-20T12:42:17</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -15,7 +15,7 @@
       <optics>
         <technique_common>
           <perspective>
-            <xfov sid="xfov">39.59775</xfov>
+            <xfov sid="xfov">38.70489</xfov>
             <aspect_ratio>1.777778</aspect_ratio>
             <znear sid="znear">0.1</znear>
             <zfar sid="zfar">100</zfar>
@@ -43,9 +43,9 @@
       </technique_common>
       <extra>
         <technique profile="blender">
-          <type sid="type" type="int">0</type>
+          <type sid="type" type="int">4</type>
           <flag sid="flag" type="int">0</flag>
-          <mode sid="mode" type="int">2097153</mode>
+          <mode sid="mode" type="int">2097152</mode>
           <red sid="red" type="float">1</red>
           <green sid="green" type="float">1</green>
           <blue sid="blue" type="float">1</blue>
@@ -55,9 +55,9 @@
           <clipsta sid="clipsta" type="float">0.04999995</clipsta>
           <clipend sid="clipend" type="float">40</clipend>
           <radius sid="radius" type="float">0.1</radius>
-          <area_shape sid="area_shape" type="int">1</area_shape>
-          <area_size sid="area_size" type="float">0.1</area_size>
-          <area_sizey sid="area_sizey" type="float">0.1</area_sizey>
+          <area_shape sid="area_shape" type="int">4</area_shape>
+          <area_size sid="area_size" type="float">2.43349</area_size>
+          <area_sizey sid="area_sizey" type="float">3.214662</area_sizey>
           <area_sizez sid="area_sizez" type="float">1</area_sizez>
         </technique>
       </extra>
@@ -213,7 +213,7 @@
         <instance_camera url="#Camera-camera"/>
       </node>
       <node id="Light" name="Light" type="NODE">
-        <matrix sid="transform">-0.2908646 -0.7711008 0.5663932 4.076245 0.9551712 -0.1998834 0.2183912 1.005454 -0.05518906 0.6045247 0.7946723 5.903862 0 0 0 1</matrix>
+        <matrix sid="transform">-0.626821 -0.598635 -0.49873 -3.106566 0.1774569 -0.7329455 0.6567343 4.198065 -0.7586861 0.3231518 0.5656575 4.223592 0 0 0 1</matrix>
         <instance_light url="#Light-light"/>
       </node>
       <node id="surface1" name="surface1" type="NODE">
