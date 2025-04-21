@@ -1,4 +1,4 @@
----
+﻿---
 title: Theory
 layout: page
 nav_order: 4
@@ -124,6 +124,28 @@ R\\G\\B
 \bend{bmatrix}
 $$
 Where S is uniform. R is given. 
+
+#### Reflection - Fresnel and Schlick
+Rays not only refract, but they reflect in a thin film model.
+
+To find the direction the ray reflects in, we simply take:
+
+$$ R = I − 2 (IN) N $$
+
+Where R is the reflected ray direction, I is incoming ray direction, and N is the surface normal the ray reflects off of.
+
+However, this equation doesn't account for how much of the ray is reflected and how much of it is transmitted and refracted through the material.
+For this, we turn to Fresnel equations. Fresnel equations give you the coefficient for the amount of light reflected off a surface, and it's inverse, which is the amount of refracted light.
+
+$$ R(\theta)  ,   (1 - R(\theta)) $$
+
+For the sake of rendering power, we opt to use the Schlick approximation, which says that 
+
+$$ R(\theta) = R_0 + (1 - R_0)(1 - \cos \theta)^5 $$
+
+where $\theta$ is the angle between the viewpoint and the surface normal and $R_0$ is:
+
+$$ R_0 = \left( \frac{n_1 - n_2}{n_1 + n_2} \right)^2 $$
 
 ### Soap Bubbles
 #### Mesh generation and physics
