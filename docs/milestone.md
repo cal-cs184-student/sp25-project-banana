@@ -12,10 +12,17 @@ nav_order: 2
 
 ## Theory
 
-Spectral ray tracing relies on treating rays with their wave-like properties.
-Of course we can't do this with exact precision since we must adapt this with the technology at hand.
+Spectral ray tracing relies on treating rays with their wave-like properties to create effects like thin-films, rainbows, and oil spills.
+The underlying theory is multiple parts.
 
+Fundamentally, we are treating every material as "glass" except every material has a unique Spectral Power Distribution.
+In layman's terms, the emitted light is composed of a different variation of different wavelengths.
+In nature, this is a continuous distribution such as in white light (black body radiation).
+In our case, we'll rely on simpler uniform distribution and a data binned distribution.
 
+Thin-films seems to effectively change this SPD with its varying interference patterns. SPD is importance as we'll deduce the RGB values using it.
+
+Using the unique SPD of the material, we'll calculate the corresponding radiance in a series of steps outlined in the paper from Dawson below. We can essentially model the BSDF similar to glass but with sampling over the wavelengths to approximate the integral needed for conversion into RGB colors. More is discussed in the <a href="/theory.html">Theory Tab</a>
 
 ## Progress
 The beginnings of the project was simply reprogramming how homework 3.

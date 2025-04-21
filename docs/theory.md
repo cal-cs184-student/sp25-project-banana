@@ -1,6 +1,7 @@
 ﻿---
 title: Theory
 layout: page
+permalink: /theory
 nav_order: 4
 ---
 
