@@ -12,7 +12,7 @@
 
 #include "pathtracer/bsdf.h"
 
-#define stat(s) // cerr << "[COLLADA Parser] " << s << endl;
+#define stat(s) cerr << "[COLLADA Parser] " << s << endl;
 
 using namespace std;
 
@@ -609,6 +609,7 @@ void ColladaParser::parse_polymesh(XMLElement* xml, PolymeshInfo& polymesh) {
   polymesh.id   = xml->Attribute( "id" );
   polymesh.name = xml->Attribute("name");
   polymesh.type = Instance::POLYMESH;
+  stat(" |- Polymesh: " << polymesh.name << " (id:" << polymesh.id << ")");
 
   XMLElement* e_mesh = xml->FirstChildElement("mesh");
   if (!e_mesh) {
@@ -857,6 +858,7 @@ void ColladaParser::parse_material ( XMLElement* xml, MaterialInfo& material ) {
   material.id   = xml->Attribute( "id" );
   material.name = xml->Attribute("name");
   material.type = Instance::MATERIAL;
+  stat(" |- Material: " << material.name << " (id:" << material.id << ")");
 
   // parse effect
   XMLElement* e_effect = get_element(xml, "instance_effect");
@@ -912,6 +914,15 @@ void ColladaParser::parse_material ( XMLElement* xml, MaterialInfo& material ) {
           float roughness = atof(e_roughness->GetText());
           float ior = atof(e_ior->GetText());
           BSDF* bsdf = new GlassBSDF(transmittance, reflectance, roughness, ior);
+          material.bsdf = bsdf;
+        } else if (type == "thinfilm") {
+          XMLElement *e_transmittance  = get_element(e_bsdf, "transmittance");
+          XMLElement *e_reflectance  = get_element(e_bsdf, "reflectance");
+          XMLElement *e_ior = get_element(e_bsdf, "ior");
+          Vector3D transmittance = spectrum_from_string(string(e_transmittance->GetText()));
+          Vector3D reflectance = spectrum_from_string(string(e_reflectance->GetText()));
+          float ior = atof(e_ior->GetText());
+          BSDF* bsdf = new SpectralBSDF(transmittance, reflectance, ior);
           material.bsdf = bsdf;
         }
         e_bsdf = e_bsdf->NextSiblingElement();

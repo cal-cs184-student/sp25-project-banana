@@ -79,23 +79,23 @@ PathTracer::estimate_direct_lighting_hemisphere(const Ray &r,
   L_out = Vector3D(0);
 
 
+  double pdf = 1/(2*PI); // p(w_j)
   for (int j = 0; j < num_samples; j++) {
-      Vector3D* w_j;
-	  double* pdf; // p(w_j)
-
       // f_r(p, w_j -> w_r)
-	  Vector3D f_r = isect.bsdf->sample_f(w_out, w_j, pdf);
+	  Vector3D w_j = hemisphereSampler->get_sample();
+	  Vector3D f_r = isect.bsdf->f(w_out, w_j);
 
       // Light from w_j direction
 	  Intersection* light_j = new Intersection();
-	  Ray* ray_j = new Ray(hit_p, (*w_j).unit());
+	  Ray* ray_j = new Ray(hit_p, w_j.unit());
       ray_j->min_t = EPS_F;
       if (!bvh->intersect(*ray_j, light_j)) continue;
       Vector3D L_i = light_j->bsdf->get_emission();
 
-      L_out += f_r * L_i * dot(*w_j, isect.n) / *pdf;
+      L_out += f_r * L_i * dot(w_j, isect.n);
   }
 
+  L_out /= pdf;
   L_out /= num_samples;
 
   return L_out;
@@ -260,11 +260,11 @@ Vector3D PathTracer::est_radiance_global_illumination(const Ray &r) {
 
   // TODO (Part 3): Return the direct illumination.
   L_out = zero_bounce_radiance(r, isect);
-  //L_out += one_bounce_radiance(r, isect);
+  L_out += one_bounce_radiance(r, isect);
 
   // TODO (Part 4): Accumulate the "direct" and "indirect"
   // parts of global illumination into L_out rather than just direct
-  L_out += at_least_one_bounce_radiance(r, isect);
+  //L_out += at_least_one_bounce_radiance(r, isect);
 
   return L_out;
 }

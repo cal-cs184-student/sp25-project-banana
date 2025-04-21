@@ -681,6 +681,7 @@ void RaytracedRenderer::worker_thread() {
     fprintf(stdout, "[PathTracer] BVH traced %llu rays.\n", bvh->total_rays);
     fprintf(stdout, "[PathTracer] Average speed %.4f million rays per second.\n", (double)bvh->total_rays / timer.duration() * 1e-6);
     fprintf(stdout, "[PathTracer] Averaged %f intersection tests per ray.\n", (((double)bvh->total_isects)/bvh->total_rays));
+    fprintf(stdout, "[PathTracer] Duration \n", timer.duration()*1e-6);
 
     lock_guard<std::mutex> lk(m_done);
     state = DONE;

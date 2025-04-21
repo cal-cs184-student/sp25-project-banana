@@ -9,10 +9,14 @@
 #include "util/image.h"
 
 #include <algorithm>
+#include <vector>
 
 namespace CGL {
 
 // Helper math functions. Assume all vectors are in unit hemisphere //
+#define PLANCK_CONSTANT 6.62607015e-34
+#define SPEED_OF_LIGHT 2.99792458e8
+#define BOLTZMANN_CONSTANT 1.38064852e-23
 
 inline double clamp (double n, double lower, double upper) {
   return std::max(lower, std::min(n, upper));
@@ -110,6 +114,7 @@ class BSDF {
    * Refraction helper
    */
   virtual bool refract(const Vector3D wo, Vector3D* wi, double ior);
+  virtual bool refract(const Vector3D wo, Vector3D* wi, double ior_o, double ior_i);
 
   const HDRImageBuffer* reflectanceMap;
   const HDRImageBuffer* normalMap;
@@ -293,13 +298,21 @@ class EmissionBSDF : public BSDF {
 class SpectralBSDF : public BSDF {
  public:
 
-  SpectralBSDF(const Vector3D transmittance, const Vector3D reflectance,
-            double roughness, double ior) :
+  SpectralBSDF(const Vector3D transmittance, const Vector3D reflectance, double ior) :
     transmittance(transmittance), reflectance(reflectance), ior(ior) { }
 
   Vector3D f(const Vector3D wo, const Vector3D wi);
   Vector3D sample_f(const Vector3D wo, Vector3D* wi, double* pdf);
-  Vector3D get_emission() const { return Vector3D(); }
+  Vector3D get_emission() const { return Vector3D(); };
+  bool is_delta() const { return false; };
+
+  double uniform_spd(double lambda) const { return 1 / (700 - 380); };
+  double black_body_spd(double lambda);
+  double custom_spd(double lambda);
+  Vector3D sample_lambda();
+  Vector3D to_xyz(double lambda);
+
+  std::vector<double> spd; // must be ordered
 
   void render_debugger_node();
 

@@ -1,4 +1,4 @@
----
+﻿---
 title: Theory
 layout: page
 nav_order: 4
@@ -11,7 +11,53 @@ nav_order: 4
 Basically treating the rays as actual light with wavelengths.
 
 
+
 ### Spectrial Power Distributions
+There we have different types of cone cells LMS.
+
+$$ 
+L = \int_0^\infty S(\lambda) \cdot \bar{L}(\lambda) d\lambda\\
+M = \int_0^\infty S(\lambda) \cdot \bar{M}(\lambda) d\lambda\\
+S = \int_0^\infty S(\lambda) \cdot \bar{S}(\lambda) d\lambda
+$$
+
+Each cone cell captures a different section of the visible spectrum.
+
+Note that light is often a combination of different wavelengths.
+For example, white light is a combination of all wavelengths in the visible spectrum.
+Over the Spectral Power Distribution (SPD) of the light source, or the "intensity" profile of the light at different wavelengths.
+We integrate with the spectral sensitivity function of the cone cells to get the response of each cone cell to the light source.
+Hence we get the discrete values LMS. For each cone cell, this gives us <L,M, S> a trichromatic value that describes light natural to how the human vision system works.
+
+
+Unfortunately, that isn't how computer screens work (limited by technological factors).
+Instead, we have RGB values.
+We can do something very similar.
+
+$$ 
+R = \int_0^\infty S(\lambda) \cdot \bar{R}(\lambda) d\lambda\\
+G = \int_0^\infty S(\lambda) \cdot \bar{G}(\lambda) d\lambda\\
+B = \int_0^\infty S(\lambda) \cdot \bar{B}(\lambda) d\lambda
+$$
+
+#### Spectral Profile
+
+- Flat uniform distribution (inaccurate)
+- Black body radiation model
+- Can be collected by data.
+
+#### Binning
+Obviously we can't integrate. We need to discretize.
+Binning resolution.
+
+#### Sampling
+Obviously, we don't want to actually integrate. We sample instead.
+- Binned sampling (sample towards)
+- Monte Carlo sampling
+- Hero sampling
+
+
+
 ### LMS CIE1931
 
 ### Thin Films Base Case
@@ -39,6 +85,45 @@ T &= \sin{(\theta_2)}(N \times \eta) - (N \cdot T) N\\
 $$
 
 (Fundamentals of Computer Graphics pg. 304)
+
+### BSDF function Take 1
+
+We basically do what we do for glass.
+We sample using the fresnel coefficient for probability of being reflected or transmitted.
+Not only do we need to sample this, but also sample over wavelengths.
+
+Uniform Hemisphere sampling for wo + russian roulette (multiple bounces).
+For each sample, we also loop over sampling the wavelengths to compute the RGB
+
+For now:
+- uniform SPD
+- uniform hemisphere sampling
+- uniform wavelength sampling
+- one bounce
+
+$$ L_{out} = L_{e}(p, \lambda, \omega_0) + \int_{H^2} f(p, \lambda, \omega_i \rightarrow \omega_o) L_o(p, \lambda, \omega_o) \cos\theta d\omega $$
+
+Discretizing this, we get:
+$$ L_{out} = L_{amb?} + \frac{1}{N} \sum \frac{f_r() L_o() \cos\theta}{p(\omega_j)} $$
+
+Where f is amount of reflectance or transmittance of this material intersection.
+L is the incoming radiance achieved through that sampled direction.
+
+To achieve f, we sample for the reflectance or transmittance.
+Then we also sample for wavelengths.
+Once we have that, we now sample across wavelengths:
+$$
+\begin{bmatrix}
+R\\G\\B
+\bend{bmatrix}
+=
+\begin{bmatrix}
+\int_0^\infty S(\lambda) \cdot \bar{R}(\lambda) d\lambda\\
+\int_0^\infty S(\lambda) \cdot \bar{G}(\lambda) d\lambda\\
+\int_0^\infty S(\lambda) \cdot \bar{B}(\lambda) d\lambda
+\bend{bmatrix}
+$$
+Where S is uniform. R is given. 
 
 #### Reflection - Fresnel and Schlick
 Rays not only refract, but they reflect in a thin film model.
@@ -68,6 +153,8 @@ $$ R_0 = \left( \frac{n_1 - n_2}{n_1 + n_2} \right)^2 $$
 
 ### Spectral Data Gathering
 ### White light caustics
+
+$$ S(\lambda)  = \frac{2 h c^2}{\lambda^5} \left[ exp\left( \frac{hc}{\lambda k_B T} \right) -1 \right]^{-1} $$
 
 ### Sampling Techniques
 
