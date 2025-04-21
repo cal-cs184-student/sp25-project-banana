@@ -217,7 +217,15 @@ double SpectralBSDF::custom_spd(double lambda) {
 };
 
 Vector3D SpectralBSDF::f(const Vector3D wo, const Vector3D wi) {
-	return Vector3D(0);
+	double R0 = powf((ior - 1) / (ior + 1), 2);
+	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
+
+	if (coin_flip(R)) {
+        std::cout << "reflected1" << std::endl;
+		return reflectance;
+	}
+    std::cout << "transmitted1" << std::endl;
+	return transmittance;
 }
 
 Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
@@ -231,12 +239,14 @@ Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
     if (coin_flip(R)) {
         *pdf = R;
 		reflect(wo, wi);
-		return reflectance * sample_lambda();
+        std::cout << "reflected" << std::endl;
+        return reflectance;
     }
 
     *pdf = 1 - R;
 	refract(wo, wi, ior);
-  return transmittance * sample_lambda();
+    std::cout << "transmitted" << std::endl;
+    return transmittance;
 }
 
 Vector3D SpectralBSDF::sample_lambda() {

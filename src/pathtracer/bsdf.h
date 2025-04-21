@@ -298,8 +298,7 @@ class EmissionBSDF : public BSDF {
 class SpectralBSDF : public BSDF {
  public:
 
-  SpectralBSDF(const Vector3D transmittance, const Vector3D reflectance,
-            double roughness, double ior) :
+  SpectralBSDF(const Vector3D transmittance, const Vector3D reflectance, double ior) :
     transmittance(transmittance), reflectance(reflectance), ior(ior) { }
 
   Vector3D f(const Vector3D wo, const Vector3D wi);
