@@ -5,11 +5,12 @@ nav_order: 2
 ---
 
 # Spectra Milestone
+> Team 62
 > Viktor Mooren, Toben Main, Curtis Hu, Ashvin Verma
 
 - [Webpage - https://cal-cs184-student.github.io/sp25-project-banana/milestone.html](https://cal-cs184-student.github.io/sp25-project-banana/milestone.html)
 - [Milestone Video - https://youtu.be/MZoIybxAVlc](https://youtu.be/MZoIybxAVlc)
-- [Slides](https://docs.google.com/presentation/d/1XqiHbex8S_Y7gesAkc4NQ1GPbnd_JDsK20qMxiLEqAM/edit?usp=sharing)
+- [Slides - https://docs.google.com/presentation/d/1XqiHbex8S_Y7gesAkc4NQ1GPbnd_JDsK20qMxiLEqAM/edit?usp=sharing](https://docs.google.com/presentation/d/1XqiHbex8S_Y7gesAkc4NQ1GPbnd_JDsK20qMxiLEqAM/edit?usp=sharing)
 
 ## Theory
 
