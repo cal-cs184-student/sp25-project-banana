@@ -46,7 +46,7 @@ We needed the code to be able to read and process these new values from the DAE 
 We've been struggling to integrate the new theory with the pre-existing code. For example, one of the problems is how the "transmittance" or "reflectance" properties work with the current radiance? It seems to be too bright now. How do we get a transparent quality? Another problem is getting `at_least_one_bounce_radiance` to work with the transmitted and reflective rays. Another problem is how we'll store and manage multiple index of refractions as the ray traverses multiple materials. We all have different ideas on how to solve these problems and it is a bit of a clas right now.
 
 ## Results
-
+<img src="res1.png" alt="" />
 - We were able to generate the new kinds of DAE files.
 - We were successfully able to rewrite the codebase to process the new DAE files and read in new material properties.
 - We were able to run the code to successfully read in `zero_bounce_illumination` and `one_bounce_illumination` for only the reflective rays of the `SpectralBSDF`
