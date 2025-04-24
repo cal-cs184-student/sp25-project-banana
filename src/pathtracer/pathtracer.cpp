@@ -149,11 +149,13 @@ PathTracer::estimate_direct_lighting_importance(const Ray &r,
           if (bvh->intersect(r, isect_i)) {
               continue;
           }
+          Vector3D f_r = ((SpectralBSDF *const) isect.bsdf)->sample_lambda(); 
 
 		  // f = f_r(w_i -> w_r) * L_i(w_i) * cos(theta_i)
           // p = pdf (uniform)
           // ~ \sum f/p (found on slides)
           L_out += isect.bsdf->f(w_out, wi) * L_i * dot(wi, isect.n) / pdf;
+          //L_out += isect.bsdf->f(w_out, wi) * L_i * dot(wi, isect.n) / pdf;
       }
   }
 

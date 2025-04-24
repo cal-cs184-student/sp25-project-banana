@@ -181,6 +181,16 @@
           </phong>
         </technique>
       </profile_COMMON>
+      <extra>
+			<technique profile="CGL">
+			  <thinfilm>
+				<reflectance>1 0.8 0.8</reflectance>
+				<transmittance>1 1 0.8</transmittance>
+				<roughness>0</roughness>
+				<ior>1.38</ior>
+			  </thinfilm>
+			</technique>
+		</extra>
     </effect>
     <effect id="leftWall-effect">
       <profile_COMMON>
@@ -207,6 +217,16 @@
           </phong>
         </technique>
       </profile_COMMON>
+      <extra>
+			<technique profile="CGL">
+			  <thinfilm>
+				<reflectance>1 0.8 0.8</reflectance>
+				<transmittance>1 1 0.8</transmittance>
+				<roughness>0</roughness>
+				<ior>1.38</ior>
+			  </thinfilm>
+			</technique>
+		</extra>
     </effect>
     <effect id="rightWall-effect">
       <profile_COMMON>
@@ -233,6 +253,16 @@
           </phong>
         </technique>
       </profile_COMMON>
+      <extra>
+			<technique profile="CGL">
+			  <thinfilm>
+				<reflectance>1 0.8 0.8</reflectance>
+				<transmittance>1 1 0.8</transmittance>
+				<roughness>0</roughness>
+				<ior>1.38</ior>
+			  </thinfilm>
+			</technique>
+		</extra>
     </effect>
     <effect id="backWall-effect">
       <profile_COMMON>
@@ -259,6 +289,16 @@
           </phong>
         </technique>
       </profile_COMMON>
+      <extra>
+			<technique profile="CGL">
+			  <thinfilm>
+				<reflectance>1 0.8 0.8</reflectance>
+				<transmittance>1 1 0.8</transmittance>
+				<roughness>0</roughness>
+				<ior>1.38</ior>
+			  </thinfilm>
+			</technique>
+		</extra>
     </effect>
   </library_effects>
   <library_materials>

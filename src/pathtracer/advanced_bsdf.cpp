@@ -5,10 +5,13 @@
 #include <utility>
 
 #include "application/visual_debugger.h"
+#include "cie_xyz.cpp"
 
 using std::max;
 using std::min;
 using std::swap;
+using std::cout;
+using std::endl;
 
 namespace CGL {
 
@@ -217,51 +220,90 @@ double SpectralBSDF::custom_spd(double lambda) {
 };
 
 Vector3D SpectralBSDF::f(const Vector3D wo, const Vector3D wi) {
+  const Matrix3x3 XYZ_to_RGB = Matrix3x3(
+    3.2406, -1.5372, -0.4986,
+  -0.9689,  1.8758,  0.0415,
+    0.0557, -0.2040,  1.0570
+  );
 	double R0 = powf((ior - 1) / (ior + 1), 2);
 	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
-
+  Vector3D spectral_response = sample_lambda();
 	if (coin_flip(R)) {
-        std::cout << "reflected1" << std::endl;
-		return reflectance;
+        //std::cout << "reflected1" << std::endl;
+		return XYZ_to_RGB * reflectance * spectral_response;
 	}
-    std::cout << "transmitted1" << std::endl;
-	return transmittance;
+    //std::cout << "transmitted1" << std::endl;
+	return XYZ_to_RGB * transmittance * spectral_response;
 }
 
 Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
 
 	// Fresnel coefficient 
 	// Fundamentals of Computer Graphics page 305
+  const Matrix3x3 XYZ_to_RGB = Matrix3x3(
+    3.2406, -1.5372, -0.4986,
+  -0.9689,  1.8758,  0.0415,
+    0.0557, -0.2040,  1.0570
+  );
 
 	double R0 = powf((ior - 1) / (ior + 1), 2);
 	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
+  Vector3D spectral_response = sample_lambda(); // <-- spectral sample modulator
 
     if (coin_flip(R)) {
         *pdf = R;
 		reflect(wo, wi);
-        std::cout << "reflected" << std::endl;
-        return reflectance;
+        //std::cout << "reflected" << std::endl;
+        return XYZ_to_RGB * reflectance * spectral_response;
     }
 
     *pdf = 1 - R;
 	refract(wo, wi, ior);
-    std::cout << "transmitted" << std::endl;
-    return transmittance;
+    //std::cout << "transmitted" << std::endl;
+    return XYZ_to_RGB * transmittance * spectral_response;
 }
 
 Vector3D SpectralBSDF::sample_lambda() {
-    int N = 10;
+    const Matrix3x3 XYZ_to_RGB = Matrix3x3(
+      3.2406, -1.5372, -0.4986,
+    -0.9689,  1.8758,  0.0415,
+      0.0557, -0.2040,  1.0570
+    );
+
+    int N = 100;
     Vector3D f;
     for (int i = 0; i < N; i++) {
-    	double lambda = random_uniform();
-		f += uniform_spd(lambda) * to_xyz(lambda);
+    	double lambda = 380.0 + random_uniform() * (830.0 - 380.0);
+		  //f += uniform_spd(lambda) * to_xyz(lambda);
+      f+= 1.0 * to_xyz(lambda);
     }
     f /= N;
 	return f;
 }
 
 Vector3D SpectralBSDF::to_xyz(double lambda) {
-    return Vector3D();
+    // CIE XYZ wavelengths range from 380 to 830 nm in 5nm steps (what i could find online)
+  int start_wavelength = 380;
+  int end_wavelength = 830;
+  int step = 5;
+
+  if (lambda < start_wavelength || lambda > end_wavelength) {
+      return Vector3D();
+   }
+
+  
+  double index = (lambda - start_wavelength) / step;
+  int i = (int)index;
+
+  if (i >= cie_xyz.size() - 1) {
+      return cie_xyz.back();
+  } else if (i < 0) {
+      return cie_xyz.front();
+  }
+
+   
+  double t = index - i;
+  return (1 - t) * cie_xyz[i] + t * cie_xyz[i + 1];
 }
 
 
