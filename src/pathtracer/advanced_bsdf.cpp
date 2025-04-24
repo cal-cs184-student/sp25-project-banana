@@ -263,21 +263,34 @@ Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
     return XYZ_to_RGB * transmittance * spectral_response;
 }
 
-Vector3D SpectralBSDF::sample_lambda() {
-    const Matrix3x3 XYZ_to_RGB = Matrix3x3(
-      3.2406, -1.5372, -0.4986,
-    -0.9689,  1.8758,  0.0415,
-      0.0557, -0.2040,  1.0570
-    );
+std::vector<double> hero_sampler(double lambda) {
+  if (lambda - 20 < 380) {
+    lambda += 20;
+  } else if (lambda + 20 > 830) {
+    lambda -= 20;
+  } 
+  std::vector<double> result;
+  result = {lambda - 20, lambda - 10, lambda, lambda + 10, lambda + 20};
+  return result;
+}
 
-    int N = 1000;
+Vector3D SpectralBSDF::sample_lambda() {
+    // int N = 10;
+    // for (int i = 0; i < N; i++) {
+    // 	double lambda = 380.0 + random_uniform() * (830.0 - 380.0);
+		//   //f += uniform_spd(lambda) * to_xyz(lambda);
+    //   f+= 1.0 * to_xyz(lambda);
+    // }
+    // f /= N;
+    
+    // hero sample!
     Vector3D f;
-    for (int i = 0; i < N; i++) {
-    	double lambda = 380.0 + random_uniform() * (830.0 - 380.0);
-		  //f += uniform_spd(lambda) * to_xyz(lambda);
-      f+= 1.0 * to_xyz(lambda);
+    double lambda = 380.0 + random_uniform() * (830.0 - 380.0);
+    std::vector<double> sample = hero_sampler(lambda);
+    for (double item : sample) {
+      f += 1.0 * to_xyz(item);
     }
-    f /= N;
+    f /= sample.size();
 	return f;
 }
 
