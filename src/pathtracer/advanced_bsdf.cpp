@@ -211,30 +211,13 @@ double SpectralBSDF::black_body_spd(double lambda) {
 
  double SpectralBSDF::custom_spd(double lambda) { 
    // assume spd is ordered
- 	for (int i = 0; i < spd_values.size() - 5; i++) {
- 		if (lambda < spd_values[i]) {
- 			return spd_values[i];
+ 	for (int i = 0; i < spd.size() - 5; i++) {
+ 		if (lambda < spd[i]) {
+ 			return spd[i];
  		}
  	}
- 	return spd_values[spd_values.size() - 5];
+ 	return spd[spd.size() - 5];
  };
-// double SpectralBSDF::custom_spd(double lambda) {
-//   if (lambda <= spd_lambda.front()) return spd_values.front();
-//   if (lambda >= spd_lambda.back()) return spd_values.back();
-
-//   for (int i = 0; i < spd_lambda.size() - 2; ++i) {
-//       double l0 = spd_lambda[i];
-//       double l1 = spd_lambda[i + 1];
-//       if (lambda >= l0 && lambda <= l1) {
-//           double v0 = spd_values[i];
-//           double v1 = spd_values[i + 1];
-//           double t = (lambda - l0) / (l1 - l0);
-//           return v0 * (1 - t) + v1 * t;
-//       }
-//   }
-
-//   return 0.0; // fallback (shouldn’t happen)
-// }
 
 Vector3D SpectralBSDF::f(const Vector3D wo, const Vector3D wi) {
   const Matrix3x3 XYZ_to_RGB = Matrix3x3(
@@ -265,7 +248,7 @@ Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
 
 	double R0 = powf((ior - 1) / (ior + 1), 2);
 	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
-  Vector3D spectral_response = sample_lambda(); // <-- spectral sample modulator
+  Vector3D spectral_response = sample_lambda(); 
 
     if (coin_flip(R)) {
         *pdf = R;
@@ -287,7 +270,7 @@ Vector3D SpectralBSDF::sample_lambda() {
       0.0557, -0.2040,  1.0570
     );
 
-    int N = 10;
+    int N = 1000;
     Vector3D f;
     for (int i = 0; i < N; i++) {
     	double lambda = 380.0 + random_uniform() * (830.0 - 380.0);
