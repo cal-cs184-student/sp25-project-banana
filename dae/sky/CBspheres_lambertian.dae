@@ -70,6 +70,16 @@
           </phong>
         </technique>
       </profile_COMMON>
+      <extra>
+      	<technique profile="CGL">
+			    <thinfilm>
+				    <reflectance>0.8 0.8 0.8</reflectance>
+				    <transmittance>0.8 0.8 0.8</transmittance>
+				    <roughness>0</roughness>
+				    <ior>1</ior>
+			    </thinfilm>
+			  </technique>
+		  </extra>
     </effect>
     <effect id="glass-effect">
       <profile_COMMON>
@@ -96,6 +106,16 @@
           </phong>
         </technique>
       </profile_COMMON>
+            <extra>
+      	<technique profile="CGL">
+			    <thinfilm>
+				    <reflectance>0.8 0.8 0.8</reflectance>
+				    <transmittance>0.8 0.8 0.8</transmittance>
+				    <roughness>0</roughness>
+				    <ior>1</ior>
+			    </thinfilm>
+			  </technique>
+		  </extra>
     </effect>
     <effect id="ceiling-effect">
       <profile_COMMON>
@@ -184,8 +204,8 @@
       <extra>
 			<technique profile="CGL">
 			  <thinfilm>
-				<reflectance>1 0.8 0.8</reflectance>
-				<transmittance>1 1 0.8</transmittance>
+				<reflectance>0.6 0.6 0.6</reflectance>
+				<transmittance>0.6 0.6 0.6</transmittance>
 				<roughness>0</roughness>
 				<ior>1.38</ior>
 			  </thinfilm>
@@ -220,10 +240,10 @@
       <extra>
 			<technique profile="CGL">
 			  <thinfilm>
-				<reflectance>1 0.8 0.8</reflectance>
-				<transmittance>1 1 0.8</transmittance>
+				<reflectance>0.6 0.2 0.2</reflectance>
+				<transmittance>0.6 0.2 0.2</transmittance>
 				<roughness>0</roughness>
-				<ior>1.38</ior>
+				<ior>1</ior>
 			  </thinfilm>
 			</technique>
 		</extra>
@@ -256,8 +276,8 @@
       <extra>
 			<technique profile="CGL">
 			  <thinfilm>
-				<reflectance>1 0.8 0.8</reflectance>
-				<transmittance>1 1 0.8</transmittance>
+				<reflectance>0.2 0.2 0.6</reflectance>
+				<transmittance>0.2 0.2 0.6</transmittance>
 				<roughness>0</roughness>
 				<ior>1.38</ior>
 			  </thinfilm>
@@ -292,8 +312,8 @@
       <extra>
 			<technique profile="CGL">
 			  <thinfilm>
-				<reflectance>1 0.8 0.8</reflectance>
-				<transmittance>1 1 0.8</transmittance>
+				<reflectance>0.6 0.6 0.6</reflectance>
+				<transmittance>0.6 0.6 0.6</transmittance>
 				<roughness>0</roughness>
 				<ior>1.38</ior>
 			  </thinfilm>
