@@ -1,7 +1,23 @@
 #include "CGL/vector3D.h"
+#include "CGL/matrix3x3.h"
+#include "vector"
+
+namespace ColorSpace {
 
 
-std::vector<CGL::Vector3D> cie_xyz = {
+
+
+
+/*
+    CIE XYZ wavelengths range from 380 to 830 nm in 5nm steps (what i could find online)
+    scuffed link but https://github.com/hughsie/colord/blob/main/data/cmf/CIE1931-2deg-XYZ.csv has the data for CIE XYZ
+
+	wavelength (nm) |  XYZ (Vector3D)
+    360 | 0.000129900000 0.000003917000 0.000606100000
+    ... | ...
+*/
+
+std::vector<CGL::Vector3D> CIE_XYZ_TABLE = {
     CGL::Vector3D(0.000129900000, 0.000003917000, 0.000606100000),
     CGL::Vector3D(0.000232100000, 0.000006965000, 0.001086000000),
     CGL::Vector3D(0.000414900000,	0.000012390000,	0.001946000000),
@@ -98,3 +114,95 @@ std::vector<CGL::Vector3D> cie_xyz = {
     CGL::Vector3D(0.000001776509,	0.000000641530,	0.000000000000),
     CGL::Vector3D(0.000001251141,	0.000000451810,	0.000000000000),
 };
+
+/*
+	WAVELENGTH -> CIE XYZ value
+    using table search and linear interpolation
+
+	PARAM: lambda wavelength in nm
+	RETURN: CIE XYZ value as a Vector3D
+*/
+CGL::Vector3D wave2xyz_table(double lambda) {
+
+  // for indexing
+  int start_wavelength = 380;
+  int end_wavelength = 830;
+  int step = 5;
+  // cie_xyz is a vector that has the CIE XYZ value for each wavelength in a 5 nm step
+  if (lambda < start_wavelength || lambda > end_wavelength) {
+      return CGL::Vector3D();
+   }
+
+  double index = (lambda - start_wavelength) / step;
+  int i = (int)index;
+
+  if (i >= CIE_XYZ_TABLE.size() - 1) {
+    // return the last value
+      return CIE_XYZ_TABLE.back();
+  } else if (i < 0) {
+    // return the first value
+      return CIE_XYZ_TABLE.front();
+  }
+
+  // t is supposed to be the fraction of the distance between the two closest wavelengths
+  // since we use 5nm steps, we interpolate in order to increase the accuracy of the approximation
+  double t = index - i;
+  return (1 - t) * CIE_XYZ_TABLE[i] + t * CIE_XYZ_TABLE[i + 1];
+}
+
+
+/*
+	Approximate analytical solution WAVLENGTH->XYZ
+    Using Single-Lob Fit
+
+	PARAM: lambda: wavelength in nm
+	RETURN: CIE XYZ value as a Vector3D
+
+	Chris Wyman, Peter-Pike Sloan, and Peter Shirley. 2013. Simple Analytic Approximations to the CIE XYZ Color Matching Functions.
+	Journal of Computer Graphics Techniques (JCGT) 2, 2 (12 July 2013),
+	1–11. http://jcgt.org/published/0002/02/01/
+*/
+
+CGL::Vector3D wave2xyz(double lambda) {
+    return CGL::Vector3D();
+}
+
+
+/*
+	Approximate analytical solution WAVLENGTH->XYZ
+	Using Multi-Lob Piecewise Gaussian Fit
+
+	PARAM: lambda: wavelength in nm
+	RETURN: CIE XYZ value as a Vector3D
+
+	Chris Wyman, Peter-Pike Sloan, and Peter Shirley. 2013. Simple Analytic Approximations to the CIE XYZ Color Matching Functions.
+	Journal of Computer Graphics Techniques (JCGT) 2, 2 (12 July 2013),
+	1–11. http://jcgt.org/published/0002/02/01/
+*/
+
+CGL::Vector3D wave2xyz_precise(double lambda) {
+    return CGL::Vector3D();
+}
+
+
+/*
+	Approximate analytical solution XYZ->RGB
+
+	PARAM: XYZ (Vector3D)
+	RETURN: sRGB (Vector3D) 
+	https://www.oceanopticsbook.info/view/photometry-and-visibility/from-xyz-to-rgb
+    http://www.brucelindbloom.com/
+
+*/
+
+CGL::Vector3D xyz_to_srgb(CGL::Vector3D xyz) {
+	const CGL::Matrix3x3 XYZ_to_RGB = CGL::Matrix3x3(
+		3.2404542,  -1.5371385, -0.4985314,
+		-0.9692660,  1.860108,   0.0415560,
+		0.0556434,  -0.2040259,  1.0572252
+	);
+	return XYZ_to_RGB * xyz;
+}
+
+
+}

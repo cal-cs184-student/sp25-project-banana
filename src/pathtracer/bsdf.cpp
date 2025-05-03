@@ -1,6 +1,4 @@
 #include "bsdf.h"
-#include "bsdf.h"
-#include "bsdf.h"
 
 #include "application/visual_debugger.h"
 

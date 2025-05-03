@@ -306,21 +306,22 @@ class SpectralBSDF : public BSDF {
   Vector3D get_emission() const { return Vector3D(); };
   bool is_delta() const { return false; };
 
-  double uniform_spd(double lambda) const { return 1.0 / (700 - 380); };
-  double black_body_spd(double lambda);
-  double custom_spd(double lambda);
-  Vector3D sample_lambda();
-  Vector3D to_xyz(double lambda);
-
-  std::vector<double> spd; // must be ordered
 
   void render_debugger_node();
+  Vector3D sample_lambda();
 
  private:
 
   double ior;
   Vector3D reflectance;
   Vector3D transmittance;
+  std::vector<double> spd; // must be ordered
+
+  std::vector<double> hero_sampler(double lambda);
+
+  double uniform_spd(double lambda) const { return 1.0 / (700 - 380); };
+  double black_body_spd(double lambda);
+  double custom_spd(double lambda);
 
 }; // class SpectralBSDF
 

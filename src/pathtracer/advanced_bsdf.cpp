@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "application/visual_debugger.h"
-#include "cie_xyz.cpp"
+#include "color_vision.cpp"
 
 using std::max;
 using std::min;
@@ -123,7 +123,13 @@ void RefractionBSDF::render_debugger_node()
 // Glass BSDF //
 
 Vector3D GlassBSDF::f(const Vector3D wo, const Vector3D wi) {
-  return Vector3D(0);
+	double R0 = powf((ior - 1) / (ior + 1), 2);
+	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
+
+    if (coin_flip(R)) {
+		return reflectance;
+    }
+    return transmittance;
 }
 
 Vector3D GlassBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
@@ -138,11 +144,13 @@ Vector3D GlassBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
 	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
 
     if (coin_flip(R)) {
+        std::cout << "r";
         *pdf = R;
 		reflect(wo, wi);
 		return reflectance;
     }
 
+    std::cout << "t";
     *pdf = 1 - R;
 	refract(wo, wi, ior);
   return transmittance;
@@ -220,42 +228,32 @@ double SpectralBSDF::black_body_spd(double lambda) {
  };
 
 Vector3D SpectralBSDF::f(const Vector3D wo, const Vector3D wi) {
-  const Matrix3x3 XYZ_to_RGB = Matrix3x3(
-    3.2406, -1.5372, -0.4986,
-  -0.9689,  1.8758,  0.0415,
-    0.0557, -0.2040,  1.0570
-  );
+	std::cout << "f called" << std::endl;
+
 	double R0 = powf((ior - 1) / (ior + 1), 2);
 	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
-  Vector3D spectral_response = sample_lambda();
+    Vector3D spectral_response = sample_lambda();
 	if (coin_flip(R)) {
     // takes the reflectance relative to the wavelength, converts to RGB before entering the pipeline
-		return XYZ_to_RGB * reflectance * spectral_response;
+		return reflectance * spectral_response;
 	}
-	return XYZ_to_RGB * transmittance * spectral_response;
+	return transmittance * spectral_response;
 }
 
 Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
 
-  // https://www.oceanopticsbook.info/view/photometry-and-visibility/from-xyz-to-rgb
-  const Matrix3x3 XYZ_to_RGB = Matrix3x3(
-    3.2406, -1.5372, -0.4986,
-  -0.9689,  1.8758,  0.0415,
-    0.0557, -0.2040,  1.0570
-  );
 	// Fresnel coefficient 
 	// Fundamentals of Computer Graphics page 305
 	double R0 = powf((ior - 1) / (ior + 1), 2);
 	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
-  Vector3D spectral_response = sample_lambda(); 
+    Vector3D spectral_response = sample_lambda(); 
 
     if (coin_flip(R)) {
         *pdf = R;
 		reflect(wo, wi);
         //std::cout << "reflected" << std::endl;
-        // i think this is correct
         // reflectance is relative to the wavelength and we convert back to RGB before entering the graphics pipeline
-        return XYZ_to_RGB * reflectance * spectral_response;
+        return reflectance;
     }
 
     *pdf = 1 - R;
@@ -263,10 +261,10 @@ Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
     //std::cout << "transmitted" << std::endl;
 
     // same as reflectance
-    return XYZ_to_RGB * transmittance * spectral_response;
+    return transmittance;
 }
 
-std::vector<double> hero_sampler(double lambda) {
+std::vector<double> SpectralBSDF::hero_sampler(double lambda) {
 
   // not a very good hero sampler
   // just gets the closest 5 wavelengths
@@ -283,57 +281,20 @@ std::vector<double> hero_sampler(double lambda) {
 }
 
 Vector3D SpectralBSDF::sample_lambda() {
-    // int N = 10;
-    // for (int i = 0; i < N; i++) {
-    // 	double lambda = 380.0 + random_uniform() * (830.0 - 380.0);
-		//   //f += uniform_spd(lambda) * to_xyz(lambda);
-    //   f+= 1.0 * to_xyz(lambda);
-    // }
-    // f /= N;
-    
     // hero sample! >> straightforward imo
     Vector3D f;
-    //gets a random lambda between 380 and 830
+    // gets a random lambda between 380 and 830
     double lambda = 380.0 + random_uniform() * (830.0 - 380.0);
     std::vector<double> sample = hero_sampler(lambda);
-    for (double item : sample) {
+    for (double wavelength : sample) {
       // this should not be 1.0, this is a placeholder value because i noticed that f was getting way to small with the uniform sampler
       // not sure how to improve
-      f += 1.0 * to_xyz(item);
+      f += 1.0 * ColorSpace::wave2xyz_table(wavelength);
     }
     f /= sample.size();
 	return f;
 }
 
-Vector3D SpectralBSDF::to_xyz(double lambda) {
-    // CIE XYZ wavelengths range from 380 to 830 nm in 5nm steps (what i could find online)
-    // scuffed link but https://github.com/hughsie/colord/blob/main/data/cmf/CIE1931-2deg-XYZ.csv has the data for CIE XYZ
-
-  // for indexing
-  int start_wavelength = 380;
-  int end_wavelength = 830;
-  int step = 5;
-  // cie_xyz is a vector that has the CIE XYZ value for each wavelength in a 5 nm step
-  if (lambda < start_wavelength || lambda > end_wavelength) {
-      return Vector3D();
-   }
-
-  double index = (lambda - start_wavelength) / step;
-  int i = (int)index;
-
-  if (i >= cie_xyz.size() - 1) {
-    // return the last value
-      return cie_xyz.back();
-  } else if (i < 0) {
-    // return the first value
-      return cie_xyz.front();
-  }
-
-  // t is supposed to be the fraction of the distance between the two closest wavelengths
-  // since we use 5nm steps, we interpolate in order to increase the accuracy of the approximation
-  double t = index - i;
-  return (1 - t) * cie_xyz[i] + t * cie_xyz[i + 1];
-}
 
 
 

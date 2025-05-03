@@ -149,7 +149,6 @@ PathTracer::estimate_direct_lighting_importance(const Ray &r,
           if (bvh->intersect(r, isect_i)) {
               continue;
           }
-          Vector3D f_r = ((SpectralBSDF *const) isect.bsdf)->sample_lambda(); 
 
 		  // f = f_r(w_i -> w_r) * L_i(w_i) * cos(theta_i)
           // p = pdf (uniform)
@@ -262,11 +261,11 @@ Vector3D PathTracer::est_radiance_global_illumination(const Ray &r) {
 
   // TODO (Part 3): Return the direct illumination.
   L_out = zero_bounce_radiance(r, isect);
-  L_out += one_bounce_radiance(r, isect);
+  //L_out += one_bounce_radiance(r, isect);
 
   // TODO (Part 4): Accumulate the "direct" and "indirect"
   // parts of global illumination into L_out rather than just direct
-  //L_out += at_least_one_bounce_radiance(r, isect);
+  L_out += at_least_one_bounce_radiance(r, isect);
 
   return L_out;
 }
