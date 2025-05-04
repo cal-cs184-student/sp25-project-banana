@@ -72,14 +72,14 @@
       </profile_COMMON>
       <extra>
       	<technique profile="CGL">
-			    <thinfilm>
-				    <reflectance>0.8 0.8 0.8</reflectance>
-				    <transmittance>0.8 0.8 0.8</transmittance>
-				    <roughness>0</roughness>
-				    <ior>1</ior>
-			    </thinfilm>
-			  </technique>
-		  </extra>
+			<thinfilm>
+				<reflectance>0.8 0.8 0.8</reflectance>
+				<transmittance>0.8 0.8 0.8</transmittance>
+				<roughness>0</roughness>
+				<ior>1</ior>
+			</thinfilm>
+		 </technique>
+	  </extra>
     </effect>
     <effect id="glass-effect">
       <profile_COMMON>

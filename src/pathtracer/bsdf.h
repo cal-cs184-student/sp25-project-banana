@@ -299,7 +299,7 @@ class SpectralBSDF : public BSDF {
  public:
 
   SpectralBSDF(const Vector3D transmittance, const Vector3D reflectance, double ior) :
-    transmittance(transmittance), reflectance(reflectance), ior(ior) { }
+    transmittance(transmittance), reflectance(reflectance), ior(ior), useCauchyApproximation(false) { }
 
   Vector3D f(const Vector3D wo, const Vector3D wi);
   Vector3D sample_f(const Vector3D wo, Vector3D* wi, double* pdf);
@@ -315,13 +315,10 @@ class SpectralBSDF : public BSDF {
   double ior;
   Vector3D reflectance;
   Vector3D transmittance;
-  std::vector<double> spd; // must be ordered
+  bool useCauchyApproximation;
 
   std::vector<double> hero_sampler(double lambda);
-
-  double uniform_spd(double lambda) const { return 1.0 / (700 - 380); };
-  double black_body_spd(double lambda);
-  double custom_spd(double lambda);
+  double spd(double lambda);
 
 }; // class SpectralBSDF
 
