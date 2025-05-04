@@ -1,6 +1,9 @@
 #ifndef CGL_APPLICATION_H
 #define CGL_APPLICATION_H
 
+// Include linux_types.h first to ensure the __u32, __u64, etc. types are defined
+#include "../util/linux_types.h"
+
 // STL
 #include <string>
 #include <iostream>

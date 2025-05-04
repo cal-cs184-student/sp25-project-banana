@@ -4,10 +4,14 @@
 #define TINYEXR_IMPLEMENTATION
 #include "CGL/tinyexr.h"
 
+// On Linux, we need to include <linux/types.h> to get __u32, __u64, etc. definitions
+// that are required by some system headers
+#ifdef __linux__
+#include <linux/types.h>
+#endif
+
 #include "application.h"
-typedef uint32_t gid_t;
 #include "util/image.h"
-typedef uint32_t gid_t;
 
 #include <iostream>
 #ifdef _WIN32
