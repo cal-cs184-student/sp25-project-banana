@@ -194,45 +194,40 @@ Vector3D PathTracer::at_least_one_bounce_radiance(const Ray &r,
   // Returns the one bounce radiance + radiance from extra bounces at this point.
   // Should be called recursively to simulate extra bounces.
 
-
-    // Always compute direct lighting first
     Vector3D direct = one_bounce_radiance(r, isect);
-    
-    if (isAccumBounces) {
-        // ACCUMULATION MODE: Add direct + continue bouncing
-        L_out += direct;
-        
-        // Russian Roulette only for indirect paths
-        if (r.depth > 1 && coin_flip(0.7)) {
-            Vector3D w_in;
-            double pdf;
-            Vector3D f = isect.bsdf->sample_f(w_out, &w_in, &pdf);
-            
-            // Convert to world space without explicit normalize()
-            Vector3D wi_world = o2w * w_in;
-            
-            // Create ray using your existing pattern
-            Ray new_ray;
-            new_ray.o = hit_p + wi_world * EPS_F;
-            new_ray.d = wi_world;
-            new_ray.min_t = EPS_F;
-            new_ray.max_t = INF_D;
-            new_ray.depth = r.depth - 1;
 
-            Intersection next_isect;
-            if (bvh->intersect(new_ray, &next_isect)) {
-                double cos_theta = fabs(dot(isect.n, wi_world));
-                Vector3D indirect = at_least_one_bounce_radiance(new_ray, next_isect);
-                L_out += (f * cos_theta * indirect) / (pdf * 0.7);
-            }
-        }
-    } else {
-        // VISUALIZATION MODE: Only count if at target depth
-        if (r.depth == 1) {  // Assuming depth=1 means "first bounce"
-            L_out += direct;
-        }
-    }
+	if (r.depth >= max_ray_depth) {
+		return direct; // L_e
+	}
 
+	if (isAccumBounces) {
+		L_out += direct;
+	}
+
+    double p = 0.4;
+	// Russian Roulette only for indirect paths
+	if (r.depth < max_ray_depth && coin_flip(p)) {
+		Vector3D w_in;
+		double pdf;
+		Vector3D f = isect.bsdf->sample_f(w_out, &w_in, &pdf);
+		
+		// Convert to world space without explicit normalize()
+		Vector3D wi_world = o2w * w_in;
+
+		// Create ray using your existing pattern
+		Ray new_ray;
+		new_ray.o = hit_p + wi_world * EPS_F;
+		new_ray.d = wi_world;
+		new_ray.min_t = EPS_F;
+		new_ray.max_t = INF_D;
+		new_ray.depth = r.depth + 1;
+
+		Intersection next_isect;
+		if (bvh->intersect(new_ray, &next_isect)) {
+			Vector3D indirect = at_least_one_bounce_radiance(new_ray, next_isect);
+            L_out += (f * abs_cos_theta(wi_world) * indirect) / (pdf * p);
+		}
+	}
 
   return L_out;
 

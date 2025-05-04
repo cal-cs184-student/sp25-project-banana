@@ -54,8 +54,8 @@ Vector3D DiffuseBSDF::f(const Vector3D wo, const Vector3D wi) {
 
     // Diffuse lambertian is independent of wo, wi
 	// Other BSDF will be dependent on wo, wi
-    // I believe this is right (over a hemisphere)
-  return reflectance;
+    // I believe this is right (over a unit hemisphere)
+  return reflectance / (2*PI);
 }
 
 /**

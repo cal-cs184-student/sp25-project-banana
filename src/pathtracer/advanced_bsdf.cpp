@@ -123,13 +123,18 @@ void RefractionBSDF::render_debugger_node()
 // Glass BSDF //
 
 Vector3D GlassBSDF::f(const Vector3D wo, const Vector3D wi) {
-	double R0 = powf((ior - 1) / (ior + 1), 2);
-	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
 
-    if (coin_flip(R)) {
-		return reflectance;
-    }
-    return transmittance;
+
+
+	//double R0 = powf((ior - 1) / (ior + 1), 2);
+	//double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wi), 5); 
+ //   //std::cout << R << std::endl;
+
+ //   if (coin_flip(R)) {
+	//	return reflectance * R;
+ //   }
+ //   return transmittance * (1 - R);
+    return Vector3D();
 }
 
 Vector3D GlassBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
@@ -140,20 +145,21 @@ Vector3D GlassBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
   // compute Fresnel coefficient and use it as the probability of reflection
   // - Fundamentals of Computer Graphics page 305
 
+
+    reflect(wo, wi);
+
 	double R0 = powf((ior - 1) / (ior + 1), 2);
 	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
 
     if (coin_flip(R)) {
-        std::cout << "r";
         *pdf = R;
-		reflect(wo, wi);
 		return reflectance;
     }
 
-    std::cout << "t";
     *pdf = 1 - R;
-	refract(wo, wi, ior);
-  return transmittance;
+	if (wo.z > 0) refract(wo, wi, ior);
+	else refract(wo, wi, ior, 1);
+    return transmittance;
 }
 
 void GlassBSDF::render_debugger_node()
@@ -175,7 +181,7 @@ void BSDF::reflect(const Vector3D wo, Vector3D* wi) {
 }
 
 bool BSDF::refract(const Vector3D wo, Vector3D* wi, double ior) {
-    return refract(wo, wi, ior, 1);
+    return refract(wo, wi, 1, ior);
 }
 bool BSDF::refract(const Vector3D wo, Vector3D* wi, double ior_o, double ior_i) {
 
@@ -186,6 +192,7 @@ bool BSDF::refract(const Vector3D wo, Vector3D* wi, double ior_o, double ior_i) 
   // ray entering the surface through vacuum.
 
     if (ior_o*ior_o*sin_theta2(wo) > ior_i*ior_i) {
+        reflect(wo, wi);
         return false;
     }
 
@@ -228,8 +235,6 @@ double SpectralBSDF::black_body_spd(double lambda) {
  };
 
 Vector3D SpectralBSDF::f(const Vector3D wo, const Vector3D wi) {
-	std::cout << "f called" << std::endl;
-
 	double R0 = powf((ior - 1) / (ior + 1), 2);
 	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
     Vector3D spectral_response = sample_lambda();
@@ -257,7 +262,7 @@ Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
     }
 
     *pdf = 1 - R;
-	refract(wo, wi, ior);
+	refract(wo, wi, ior, 1);
     //std::cout << "transmitted" << std::endl;
 
     // same as reflectance
