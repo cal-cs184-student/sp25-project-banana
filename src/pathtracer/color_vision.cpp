@@ -195,14 +195,20 @@ CGL::Vector3D wave2xyz_precise(double lambda) {
 
 */
 
-CGL::Vector3D xyz_to_srgb(CGL::Vector3D xyz) {
-	const CGL::Matrix3x3 XYZ_to_RGB = CGL::Matrix3x3(
-		3.2404542,  -1.5371385, -0.4985314,
-		-0.9692660,  1.860108,   0.0415560,
-		0.0556434,  -0.2040259,  1.0572252
-	);
-	return XYZ_to_RGB * xyz;
-}
+const CGL::Matrix3x3 M_inv = CGL::Matrix3x3(
+	3.2404542,  -1.5371385, -0.4985314,
+	-0.9692660,  1.860108,   0.0415560,
+	0.0556434,  -0.2040259,  1.0572252
+);
 
+const CGL::Matrix3x3 M = CGL::Matrix3x3(
+	0.4124564, 0.3575761, 0.1804375,
+	0.2126729, 0.7151522, 0.0721750,
+	0.0193339, 0.1191920, 0.9503041
+);
+
+CGL::Vector3D xyz_to_srgb(CGL::Vector3D xyz) {
+	return ColorSpace::M * xyz;
+}
 
 }

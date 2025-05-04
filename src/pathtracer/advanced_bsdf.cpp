@@ -226,73 +226,70 @@ void SpectralBSDF::render_debugger_node()
   }
 }
 
-double SpectralBSDF::black_body_spd(double lambda) {
-	  lambda = lambda * 1e-9; // convert nm to m
-	  double K = 2 * PLANCK_CONSTANT * SPEED_OF_LIGHT * SPEED_OF_LIGHT / pow(lambda, 5);
-      double T = 500;
-	  double exp_term = exp(PLANCK_CONSTANT * SPEED_OF_LIGHT / (lambda * BOLTZMANN_CONSTANT * T));
-	  return K / (exp_term - 1);
-}
+ double SpectralBSDF::spd(double lambda) { 
+	 // s(lambda) = R * s_r + G * s_g + B * s_b
+     // Dawson and Mallet papers
 
- double SpectralBSDF::custom_spd(double lambda) { 
-   // assume spd is ordered
- 	for (int i = 0; i < spd.size() - 5; i++) {
- 		if (lambda < spd[i]) {
- 			return spd[i];
- 		}
- 	}
- 	return spd[spd.size() - 5];
+	 double x = 1.065 * expf(-0.5 * powf((lambda - 550) / 50, 2));
+	 double y = 1.065 * expf(-0.5 * powf((lambda - 550) / 50, 2));
+	 double z = 1.065 * expf(-0.5 * powf((lambda - 550) / 50, 2));
+
+     return  0;
  };
 
 Vector3D SpectralBSDF::f(const Vector3D wo, const Vector3D wi) {
-	double R0 = powf((ior - 1) / (ior + 1), 2);
-	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
-    Vector3D spectral_response = sample_lambda();
-	if (coin_flip(R)) {
-    // takes the reflectance relative to the wavelength, converts to RGB before entering the pipeline
-		return reflectance * spectral_response;
-	}
-	return transmittance * spectral_response;
+    return Vector3D();
 }
 
 Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
 
-	// Fresnel coefficient 
-	// Fundamentals of Computer Graphics page 305
+    if (!refract(wo, wi, ior)) {
+		reflect(wo, wi);
+        *pdf = 1;
+		return reflectance / abs_cos_theta(*wi);
+    }
+
+    double n = ior;
+    if (true) {
+        n = 0;
+		std::vector wavelengths = hero_sampler(random_uniform() * (830 - 380) + 380);
+        for (auto l : wavelengths) {
+            // Glass IOR
+			n += ior + 50000 / (l * l);
+        }
+        n /= wavelengths.size();
+    }
+	double eta = wo.z > 0 ? 1 / n : n;
+
 	double R0 = powf((ior - 1) / (ior + 1), 2);
 	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
-    Vector3D spectral_response = sample_lambda(); 
 
     if (coin_flip(R)) {
-        *pdf = R;
 		reflect(wo, wi);
-        //std::cout << "reflected" << std::endl;
-        // reflectance is relative to the wavelength and we convert back to RGB before entering the graphics pipeline
-        return reflectance;
+        *pdf = R;
+		return reflectance / abs_cos_theta(*wi);
     }
 
     *pdf = 1 - R;
-	refract(wo, wi, ior, 1);
-    //std::cout << "transmitted" << std::endl;
-
-    // same as reflectance
-    return transmittance;
+    return (1 - R) * transmittance / abs_cos_theta(*wi) / (eta*eta);
 }
 
+/**
+    Takes in a hero wavelength, returns an array of sampled wavelengths
+*/
 std::vector<double> SpectralBSDF::hero_sampler(double lambda) {
 
-  // not a very good hero sampler
-  // just gets the closest 5 wavelengths
-  // to the given wavelength
-  double lambda2 = lambda;
-  if (lambda - 20 < 380) {
-    lambda2 += 20;
-  } else if (lambda + 20 > 830) {
-    lambda2 -= 20;
-  } 
-  std::vector<double> result;
-  result = {lambda2 - 20, lambda2 - 10, lambda, lambda2 + 10, lambda2 + 20};
-  return result;
+    // Based on Wilkie, Nawaz, et al.
+	double lambda_min = 380, lambda_max = 830;
+	double range = lambda_max - lambda_min;
+	double hero = lambda;
+    int C = 10;
+
+	std::vector<double> rotary(C);
+    for (int j = 0; j < C; j++) {
+		rotary[j] = fmodf(hero - lambda_min + j / C * range, range) + lambda_min;
+    }
+    return rotary;
 }
 
 Vector3D SpectralBSDF::sample_lambda() {
