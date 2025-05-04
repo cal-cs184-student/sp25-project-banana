@@ -68,9 +68,22 @@ HDRImageBuffer *load_exr(const char *file_path) {
 
   HDRImageBuffer *envmap = new HDRImageBuffer();
   envmap->resize(exr.width, exr.height);
-  float *channel_r = (float *)exr.images[2];
-  float *channel_g = (float *)exr.images[1];
-  float *channel_b = (float *)exr.images[0];
+  
+  int idxR = -1, idxG = -1, idxB = -1;
+  for (int i = 0; i < exr.num_channels; i++) {
+    const char* n = exr.channel_names[i];
+    if      (strcmp(n, "R") == 0) idxR = i;
+    else if (strcmp(n, "G") == 0) idxG = i;
+    else if (strcmp(n, "B") == 0) idxB = i;
+  }
+  assert(idxR >= 0 && idxG >= 0 && idxB >= 0);
+
+  float *channel_r = (float*)exr.images[idxR];
+  float *channel_g = (float*)exr.images[idxG];
+  float *channel_b = (float*)exr.images[idxB];
+
+
+  
   for (size_t i = 0; i < exr.width * exr.height; i++) {
     envmap->data[i] = Vector3D(channel_r[i], channel_g[i], channel_b[i]);
   }
@@ -121,6 +134,13 @@ int main(int argc, char **argv) {
       config.pathtracer_samples_per_patch =
           settings.pathtracer_samples_per_patch;
       config.pathtracer_accumulate_bounces = settings.pathtracer_accumulate_bounces;
+      
+      // Load environment map if specified
+      if (!settings.envmap_path.empty()) {
+        std::cout << "[PathTracer] Loading environment map " << settings.envmap_path
+                  << std::endl;
+        config.pathtracer_envmap = load_exr(settings.envmap_path.c_str());
+      }
     }
   } else {
     while ((opt = getopt(argc, argv, "s:l:t:m:o:e:h:H:f:r:c:b:d:a:p:")) !=

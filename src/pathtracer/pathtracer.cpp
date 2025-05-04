@@ -70,14 +70,7 @@ PathTracer::estimate_direct_lighting_hemisphere(const Ray &r,
   int num_samples = scene->lights.size() * ns_area_light;
   Vector3D L_out;
 
-  // TODO (Part 3): Write your sampling loop here
-  // TODO BEFORE YOU BEGIN
-  // UPDATE `est_radiance_global_illumination` to return direct lighting instead of normal shading 
-
-  // Just copying the slides
-
   L_out = Vector3D(0);
-
 
   double pdf = 1/(2*PI); // p(w_j)
   for (int j = 0; j < num_samples; j++) {
@@ -87,19 +80,27 @@ PathTracer::estimate_direct_lighting_hemisphere(const Ray &r,
 
       // Light from w_j direction
 	  Intersection* light_j = new Intersection();
-	  Ray* ray_j = new Ray(hit_p, w_j.unit());
+	  Ray* ray_j = new Ray(hit_p, o2w * w_j);
       ray_j->min_t = EPS_F;
-      if (!bvh->intersect(*ray_j, light_j)) continue;
+      
+      // Check if we hit anything in the scene
+      if (!bvh->intersect(*ray_j, light_j)) {
+          // If we don't hit anything but we have an environment map, use it
+          if (envLight) {
+              Vector3D env_radiance = envLight->sample_dir(*ray_j);
+              L_out += f_r * env_radiance * abs_cos_theta(w_j);
+          }
+          continue;
+      }
+      
       Vector3D L_i = light_j->bsdf->get_emission();
-
-      L_out += f_r * L_i * dot(w_j, isect.n);
+      L_out += f_r * L_i * abs_cos_theta(w_j);
   }
 
   L_out /= pdf;
   L_out /= num_samples;
 
   return L_out;
-
 }
 
 Vector3D
@@ -225,8 +226,12 @@ Vector3D PathTracer::at_least_one_bounce_radiance(const Ray &r,
 		Intersection next_isect;
 		if (bvh->intersect(new_ray, &next_isect)) {
 			Vector3D indirect = at_least_one_bounce_radiance(new_ray, next_isect);
-            L_out += (f * abs_cos_theta(wi_world) * indirect) / (pdf * p);
-		}
+            L_out += (f * abs_cos_theta(w_in) * indirect) / (pdf * p);
+		} else if (envLight) {
+            // If we miss all objects but have an environment map, include its contribution
+            Vector3D env_radiance = envLight->sample_dir(new_ray);
+            L_out += (f * abs_cos_theta(w_in) * env_radiance) / (pdf * p);
+        }
 	}
 
   return L_out;

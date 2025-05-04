@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library_effects>
+  <effect id="bunny_material-effect">
+    <profile_COMMON>
+      <technique sid="common">
+        <blinn>
+          <transparent>
+            <color>0.9 0.9 0.9 1.0</color>
+          </transparent>
+          <transparency>
+            <float>0.5</float>
+          </transparency>
+          <index_of_refraction>
+            <float>1.5</float>
+          </index_of_refraction>
+          <reflective>
+            <color>0.2 0.2 0.2 1</color>
+          </reflective>
+          <reflectivity>
+            <float>0.3</float>
+          </reflectivity>
+          <specular>
+            <color>1.0 1.0 1.0 1</color>
+          </specular>
+          <shininess>
+            <float>50.0</float>
+          </shininess>
+        </blinn>
+      </technique>
+    </profile_COMMON>
+  </effect>
+</library_effects>
