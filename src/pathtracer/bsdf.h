@@ -298,27 +298,33 @@ class EmissionBSDF : public BSDF {
 class SpectralBSDF : public BSDF {
  public:
 
-  SpectralBSDF(const Vector3D transmittance, const Vector3D reflectance, double ior) :
-    transmittance(transmittance), reflectance(reflectance), ior(ior), useCauchyApproximation(false) { }
+  // New constructor for thin film with optional base material
+  SpectralBSDF(const Vector3D& transmittance, const Vector3D& reflectance, double film_ior, double thickness = 500.0, double base_ior = 1.0, BSDF* base_bsdf = nullptr)
+    : transmittance(transmittance), reflectance(reflectance), film_ior(film_ior), thickness(thickness), base_ior(base_ior), base_bsdf(base_bsdf), useCauchyApproximation(false) { }
 
   Vector3D f(const Vector3D wo, const Vector3D wi);
   Vector3D sample_f(const Vector3D wo, Vector3D* wi, double* pdf);
   Vector3D get_emission() const { return Vector3D(); };
   bool is_delta() const { return false; };
 
-
   void render_debugger_node();
   Vector3D sample_lambda();
 
  private:
+  // Thin film parameters
+  double film_ior;    // Index of refraction of the film
+  double thickness;   // Film thickness in nanometers
+  double base_ior;    // Index of refraction of the base material
+  BSDF* base_bsdf;    // Optional base BSDF for complex substrates
 
-  double ior;
   Vector3D reflectance;
   Vector3D transmittance;
   bool useCauchyApproximation;
 
   std::vector<double> hero_sampler(double lambda);
   double spd(double lambda);
+  // Airy reflectance for thin film interference
+  double airy_reflectance(const Vector3D& wo, double lambda, double thickness) const;
 
 }; // class SpectralBSDF
 
