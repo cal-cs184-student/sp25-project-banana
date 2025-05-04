@@ -70,14 +70,7 @@ PathTracer::estimate_direct_lighting_hemisphere(const Ray &r,
   int num_samples = scene->lights.size() * ns_area_light;
   Vector3D L_out;
 
-  // TODO (Part 3): Write your sampling loop here
-  // TODO BEFORE YOU BEGIN
-  // UPDATE `est_radiance_global_illumination` to return direct lighting instead of normal shading 
-
-  // Just copying the slides
-
   L_out = Vector3D(0);
-
 
   double pdf = 1/(2*PI); // p(w_j)
   for (int j = 0; j < num_samples; j++) {
@@ -87,19 +80,27 @@ PathTracer::estimate_direct_lighting_hemisphere(const Ray &r,
 
       // Light from w_j direction
 	  Intersection* light_j = new Intersection();
-	  Ray* ray_j = new Ray(hit_p, w_j.unit());
+	  Ray* ray_j = new Ray(hit_p, o2w * w_j);
       ray_j->min_t = EPS_F;
-      if (!bvh->intersect(*ray_j, light_j)) continue;
+      
+      // Check if we hit anything in the scene
+      if (!bvh->intersect(*ray_j, light_j)) {
+          // If we don't hit anything but we have an environment map, use it
+          if (envLight) {
+              Vector3D env_radiance = envLight->sample_dir(*ray_j);
+              L_out += f_r * env_radiance * abs_cos_theta(w_j);
+          }
+          continue;
+      }
+      
       Vector3D L_i = light_j->bsdf->get_emission();
-
-      L_out += f_r * L_i * dot(w_j, isect.n);
+      L_out += f_r * L_i * abs_cos_theta(w_j);
   }
 
   L_out /= pdf;
   L_out /= num_samples;
 
   return L_out;
-
 }
 
 Vector3D
@@ -149,7 +150,6 @@ PathTracer::estimate_direct_lighting_importance(const Ray &r,
           if (bvh->intersect(r, isect_i)) {
               continue;
           }
-          Vector3D f_r = ((SpectralBSDF *const) isect.bsdf)->sample_lambda(); 
 
 		  // f = f_r(w_i -> w_r) * L_i(w_i) * cos(theta_i)
           // p = pdf (uniform)
@@ -195,45 +195,44 @@ Vector3D PathTracer::at_least_one_bounce_radiance(const Ray &r,
   // Returns the one bounce radiance + radiance from extra bounces at this point.
   // Should be called recursively to simulate extra bounces.
 
-
-    // Always compute direct lighting first
     Vector3D direct = one_bounce_radiance(r, isect);
-    
-    if (isAccumBounces) {
-        // ACCUMULATION MODE: Add direct + continue bouncing
-        L_out += direct;
-        
-        // Russian Roulette only for indirect paths
-        if (r.depth > 1 && coin_flip(0.7)) {
-            Vector3D w_in;
-            double pdf;
-            Vector3D f = isect.bsdf->sample_f(w_out, &w_in, &pdf);
-            
-            // Convert to world space without explicit normalize()
-            Vector3D wi_world = o2w * w_in;
-            
-            // Create ray using your existing pattern
-            Ray new_ray;
-            new_ray.o = hit_p + wi_world * EPS_F;
-            new_ray.d = wi_world;
-            new_ray.min_t = EPS_F;
-            new_ray.max_t = INF_D;
-            new_ray.depth = r.depth - 1;
 
-            Intersection next_isect;
-            if (bvh->intersect(new_ray, &next_isect)) {
-                double cos_theta = fabs(dot(isect.n, wi_world));
-                Vector3D indirect = at_least_one_bounce_radiance(new_ray, next_isect);
-                L_out += (f * cos_theta * indirect) / (pdf * 0.7);
-            }
-        }
-    } else {
-        // VISUALIZATION MODE: Only count if at target depth
-        if (r.depth == 1) {  // Assuming depth=1 means "first bounce"
-            L_out += direct;
-        }
-    }
+	if (r.depth >= max_ray_depth) {
+		return direct; // L_e
+	}
 
+	if (isAccumBounces) {
+		L_out += direct;
+	}
+
+    double p = 0.4;
+	// Russian Roulette only for indirect paths
+	if (r.depth < max_ray_depth && coin_flip(p)) {
+		Vector3D w_in;
+		double pdf;
+		Vector3D f = isect.bsdf->sample_f(w_out, &w_in, &pdf);
+		
+		// Convert to world space without explicit normalize()
+		Vector3D wi_world = o2w * w_in;
+
+		// Create ray using your existing pattern
+		Ray new_ray;
+		new_ray.o = hit_p + wi_world * EPS_F;
+		new_ray.d = wi_world;
+		new_ray.min_t = EPS_F;
+		new_ray.max_t = INF_D;
+		new_ray.depth = r.depth + 1;
+
+		Intersection next_isect;
+		if (bvh->intersect(new_ray, &next_isect)) {
+			Vector3D indirect = at_least_one_bounce_radiance(new_ray, next_isect);
+            L_out += (f * abs_cos_theta(w_in) * indirect) / (pdf * p);
+		} else if (envLight) {
+            // If we miss all objects but have an environment map, include its contribution
+            Vector3D env_radiance = envLight->sample_dir(new_ray);
+            L_out += (f * abs_cos_theta(w_in) * env_radiance) / (pdf * p);
+        }
+	}
 
   return L_out;
 
@@ -262,11 +261,11 @@ Vector3D PathTracer::est_radiance_global_illumination(const Ray &r) {
 
   // TODO (Part 3): Return the direct illumination.
   L_out = zero_bounce_radiance(r, isect);
-  L_out += one_bounce_radiance(r, isect);
+  //L_out += one_bounce_radiance(r, isect);
 
   // TODO (Part 4): Accumulate the "direct" and "indirect"
   // parts of global illumination into L_out rather than just direct
-  //L_out += at_least_one_bounce_radiance(r, isect);
+  L_out += at_least_one_bounce_radiance(r, isect);
 
   return L_out;
 }

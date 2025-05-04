@@ -37,10 +37,6 @@ namespace CGL { namespace SceneObjects {
     }
 
 
-
-
-
-
     if (true)
       std::cout << "Saving out probability_debug image for debug." << std::endl;
     save_probability_debug();
@@ -125,28 +121,20 @@ namespace CGL { namespace SceneObjects {
   Vector3D EnvironmentLight::sample_L(const Vector3D p, Vector3D* wi,
     double* distToLight,
     double* pdf) const {
-    // TODO: 3-2 Part 3 Tasks 2 and 3 (step 4)
-    // First implement uniform sphere sampling for the environment light
-    // Later implement full importance sampling
-
-    // Uniform
-    *wi = sampler_uniform_sphere.get_sample();
+    // Uniform sphere sampling for environment light
+    *wi = sampler_uniform_sphere.get_sample().unit();
     *distToLight = INF_D;
     *pdf = 1.0 / (4.0 * PI);
-
-
-
-
-    return Vector3D();
+    // Return radiance along sampled direction
+    Ray sample_ray(p, *wi);
+    return sample_dir(sample_ray);
   }
 
   Vector3D EnvironmentLight::sample_dir(const Ray& r) const {
-    // TODO: 3-2 Part 3 Task 1
-    // Use the helper functions to convert r.d into (x,y)
-    // then bilerp the return value
-
-    return Vector3D();
-
+    // Map direction to texture coordinates and bilinearly interpolate
+    Vector2D theta_phi = dir_to_theta_phi(r.d);
+    Vector2D xy = theta_phi_to_xy(theta_phi);
+    return bilerp(xy);
   }
 
 } // namespace SceneObjects

@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "application/visual_debugger.h"
-#include "cie_xyz.cpp"
+#include "color_vision.cpp"
 
 using std::max;
 using std::min;
@@ -18,7 +18,7 @@ namespace CGL {
 // Mirror BSDF //
 
 Vector3D MirrorBSDF::f(const Vector3D wo, const Vector3D wi) {
-  return reflectance / abs_cos_theta(wi);
+  return Vector3D();
 }
 
 Vector3D MirrorBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
@@ -27,7 +27,7 @@ Vector3D MirrorBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
   // Implement MirrorBSDF
   reflect(wo, wi);
   *pdf = 1.0;
-  return f(wo, *wi);
+  return reflectance / abs_cos_theta(*wi);
 }
 
 void MirrorBSDF::render_debugger_node()
@@ -97,7 +97,7 @@ void MicrofacetBSDF::render_debugger_node()
 // Refraction BSDF //
 
 Vector3D RefractionBSDF::f(const Vector3D wo, const Vector3D wi) {
-  return transmittance;
+  return Vector3D();
 }
 
 Vector3D RefractionBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
@@ -105,9 +105,18 @@ Vector3D RefractionBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) 
   // TODO:
   // Implement RefractionBSDF
 
-    *pdf = 1.0;
-	refract(wo, wi, ior);
-  return f(wo, *wi);
+    double eta = wo.z > 0 ? 1 / ior : ior;
+
+    // Internal reflection
+	if (1 - eta * eta * sin_theta2(wo) < 0) {
+		reflect(wo, wi);
+		*pdf = 1.0;
+		return Vector3D();
+	}
+
+  *pdf = 1.0;
+  refract(wo, wi, ior);
+  return transmittance / abs_cos_theta(*wi) / (eta*eta);
 }
 
 void RefractionBSDF::render_debugger_node()
@@ -123,7 +132,7 @@ void RefractionBSDF::render_debugger_node()
 // Glass BSDF //
 
 Vector3D GlassBSDF::f(const Vector3D wo, const Vector3D wi) {
-  return Vector3D(0);
+    return Vector3D();
 }
 
 Vector3D GlassBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
@@ -134,18 +143,24 @@ Vector3D GlassBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
   // compute Fresnel coefficient and use it as the probability of reflection
   // - Fundamentals of Computer Graphics page 305
 
+    if (!refract(wo, wi, ior)) {
+		reflect(wo, wi);
+        *pdf = 1;
+		return reflectance / abs_cos_theta(*wi);
+    }
+
+	double eta = wo.z > 0 ? 1 / ior : ior;
 	double R0 = powf((ior - 1) / (ior + 1), 2);
 	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
 
     if (coin_flip(R)) {
-        *pdf = R;
 		reflect(wo, wi);
-		return reflectance;
+        *pdf = R;
+		return reflectance / abs_cos_theta(*wi);
     }
 
     *pdf = 1 - R;
-	refract(wo, wi, ior);
-  return transmittance;
+    return (1 - R) * transmittance / abs_cos_theta(*wi) / (eta*eta);
 }
 
 void GlassBSDF::render_debugger_node()
@@ -167,7 +182,16 @@ void BSDF::reflect(const Vector3D wo, Vector3D* wi) {
 }
 
 bool BSDF::refract(const Vector3D wo, Vector3D* wi, double ior) {
-    return refract(wo, wi, ior, 1);
+    double eta = wo.z > 0 ? 1 / ior : ior;
+
+	if (1 - eta * eta * sin_theta2(wo) < 0) {
+		reflect(wo, wi);
+		return false;
+	}
+
+	double sign = wo.z > 0 ? -1 : 1;
+	*wi = Vector3D(-eta * wo.x, -eta * wo.y, sign * sqrt(1 - eta*eta*(1 - wo.z*wo.z)) );
+    return true;
 }
 bool BSDF::refract(const Vector3D wo, Vector3D* wi, double ior_o, double ior_i) {
 
@@ -177,15 +201,16 @@ bool BSDF::refract(const Vector3D wo, Vector3D* wi, double ior_o, double ior_i) 
   // and true otherwise. When dot(wo,n) is positive, then wo corresponds to a
   // ray entering the surface through vacuum.
 
-    if (ior_o*ior_o*sin_theta2(wo) > ior_i*ior_i) {
-        return false;
-    }
+    double eta = ior_i / ior_o;
 
-	Vector3D N = Vector3D(0, 0, 1);
-	*wi = ior_o/ior_i * cross(N, cross(-N, wo))
-       - N * sqrt(1 - (ior_o*ior_o/(ior_i*ior_i)) * sin_theta2(wo));
+	if (1 - eta * eta * sin_theta2(wo) < 0) {
+		reflect(wo, wi);
+		return false;
+	}
 
-  return true;
+	double sign = wo.z > 0 ? -1 : 1;
+	*wi = Vector3D(-eta * wo.x, -eta * wo.y, sign * sqrt(1 - eta*eta*(1 - wo.z*wo.z)) );
+    return true;
 
 }
 
@@ -201,123 +226,87 @@ void SpectralBSDF::render_debugger_node()
   }
 }
 
-double SpectralBSDF::black_body_spd(double lambda) {
-	  lambda = lambda * 1e-9; // convert nm to m
-	  double K = 2 * PLANCK_CONSTANT * SPEED_OF_LIGHT * SPEED_OF_LIGHT / pow(lambda, 5);
-      double T = 500;
-	  double exp_term = exp(PLANCK_CONSTANT * SPEED_OF_LIGHT / (lambda * BOLTZMANN_CONSTANT * T));
-	  return K / (exp_term - 1);
-}
+ double SpectralBSDF::spd(double lambda) { 
+	 // s(lambda) = R * s_r + G * s_g + B * s_b
+     // Dawson and Mallet papers
 
- double SpectralBSDF::custom_spd(double lambda) { 
-   // assume spd is ordered
- 	for (int i = 0; i < spd.size() - 5; i++) {
- 		if (lambda < spd[i]) {
- 			return spd[i];
- 		}
- 	}
- 	return spd[spd.size() - 5];
+	 double x = 1.065 * expf(-0.5 * powf((lambda - 550) / 50, 2));
+	 double y = 1.065 * expf(-0.5 * powf((lambda - 550) / 50, 2));
+	 double z = 1.065 * expf(-0.5 * powf((lambda - 550) / 50, 2));
+
+     return  0;
  };
 
 Vector3D SpectralBSDF::f(const Vector3D wo, const Vector3D wi) {
-  const Matrix3x3 XYZ_to_RGB = Matrix3x3(
-    3.2406, -1.5372, -0.4986,
-  -0.9689,  1.8758,  0.0415,
-    0.0557, -0.2040,  1.0570
-  );
-	double R0 = powf((ior - 1) / (ior + 1), 2);
-	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
-  Vector3D spectral_response = sample_lambda();
-	if (coin_flip(R)) {
-        //std::cout << "reflected1" << std::endl;
-		return XYZ_to_RGB * reflectance * spectral_response;
-	}
-    //std::cout << "transmitted1" << std::endl;
-	return XYZ_to_RGB * transmittance * spectral_response;
+    return Vector3D();
 }
 
 Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
 
-	// Fresnel coefficient 
-	// Fundamentals of Computer Graphics page 305
-  const Matrix3x3 XYZ_to_RGB = Matrix3x3(
-    3.2406, -1.5372, -0.4986,
-  -0.9689,  1.8758,  0.0415,
-    0.0557, -0.2040,  1.0570
-  );
+    if (!refract(wo, wi, ior)) {
+		reflect(wo, wi);
+        *pdf = 1;
+		return reflectance / abs_cos_theta(*wi);
+    }
+
+    double n = ior;
+    if (true) {
+        n = 0;
+		std::vector wavelengths = hero_sampler(random_uniform() * (830 - 380) + 380);
+        for (auto l : wavelengths) {
+            // Glass IOR
+			n += ior + 50000 / (l * l);
+        }
+        n /= wavelengths.size();
+    }
+	double eta = wo.z > 0 ? 1 / n : n;
 
 	double R0 = powf((ior - 1) / (ior + 1), 2);
 	double R = R0 + (1 - R0) * powf(1 - abs_cos_theta(wo), 5);
-  Vector3D spectral_response = sample_lambda(); 
 
     if (coin_flip(R)) {
-        *pdf = R;
 		reflect(wo, wi);
-        //std::cout << "reflected" << std::endl;
-        return XYZ_to_RGB * reflectance * spectral_response;
+        *pdf = R;
+		return reflectance / abs_cos_theta(*wi);
     }
 
     *pdf = 1 - R;
-	refract(wo, wi, ior);
-    //std::cout << "transmitted" << std::endl;
-    return XYZ_to_RGB * transmittance * spectral_response;
+    return (1 - R) * transmittance / abs_cos_theta(*wi) / (eta*eta);
 }
 
-std::vector<double> hero_sampler(double lambda) {
-  if (lambda - 20 < 380) {
-    lambda += 20;
-  } else if (lambda + 20 > 830) {
-    lambda -= 20;
-  } 
-  std::vector<double> result;
-  result = {lambda - 20, lambda - 10, lambda, lambda + 10, lambda + 20};
-  return result;
+/**
+    Takes in a hero wavelength, returns an array of sampled wavelengths
+*/
+std::vector<double> SpectralBSDF::hero_sampler(double lambda) {
+
+    // Based on Wilkie, Nawaz, et al.
+	double lambda_min = 380, lambda_max = 830;
+	double range = lambda_max - lambda_min;
+	double hero = lambda;
+    int C = 10;
+
+	std::vector<double> rotary(C);
+    for (int j = 0; j < C; j++) {
+		rotary[j] = fmodf(hero - lambda_min + j / C * range, range) + lambda_min;
+    }
+    return rotary;
 }
 
 Vector3D SpectralBSDF::sample_lambda() {
-    // int N = 10;
-    // for (int i = 0; i < N; i++) {
-    // 	double lambda = 380.0 + random_uniform() * (830.0 - 380.0);
-		//   //f += uniform_spd(lambda) * to_xyz(lambda);
-    //   f+= 1.0 * to_xyz(lambda);
-    // }
-    // f /= N;
-    
-    // hero sample!
+    // hero sample! >> straightforward imo
     Vector3D f;
+    // gets a random lambda between 380 and 830
     double lambda = 380.0 + random_uniform() * (830.0 - 380.0);
     std::vector<double> sample = hero_sampler(lambda);
-    for (double item : sample) {
-      f += 1.0 * to_xyz(item);
+    for (double wavelength : sample) {
+      // this should not be 1.0, this is a placeholder value because i noticed that f was getting way to small with the uniform sampler
+      // not sure how to improve
+      f += 1.0 * ColorSpace::wave2xyz_table(wavelength);
     }
     f /= sample.size();
 	return f;
 }
 
-Vector3D SpectralBSDF::to_xyz(double lambda) {
-    // CIE XYZ wavelengths range from 380 to 830 nm in 5nm steps (what i could find online)
-  int start_wavelength = 380;
-  int end_wavelength = 830;
-  int step = 5;
-
-  if (lambda < start_wavelength || lambda > end_wavelength) {
-      return Vector3D();
-   }
-
-  
-  double index = (lambda - start_wavelength) / step;
-  int i = (int)index;
-
-  if (i >= cie_xyz.size() - 1) {
-      return cie_xyz.back();
-  } else if (i < 0) {
-      return cie_xyz.front();
-  }
-
-   
-  double t = index - i;
-  return (1 - t) * cie_xyz[i] + t * cie_xyz[i + 1];
-}
 
 
 

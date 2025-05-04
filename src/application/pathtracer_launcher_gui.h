@@ -28,6 +28,8 @@ struct GUISettings {
 
     pathtracer_lensRadius = 0.0;
     pathtracer_focalDistance = 4.7;
+    
+    envmap_path = "";
   }
 
   void serialize(const std::string &a_file_path);
@@ -47,7 +49,6 @@ struct GUISettings {
   float pathtracer_max_tolerance;
   size_t pathtracer_samples_per_patch;
 
-
   bool pathtracer_direct_hemisphere_sample;
   bool render_custom_region = false;
   bool pathtracer_accumulate_bounces = true;
@@ -62,6 +63,7 @@ struct GUISettings {
   int w = 1024, h = 768, x = -1, y = 0, dx = 0, dy = 0;
   std::string output_file_name, cam_settings = "";
   std::string scene_file_path = "";
+  std::string envmap_path;
 };
 void render_loop(GLFWwindow *a_window, GUISettings &a_settings);
 int draw(GUISettings &a_settings);
