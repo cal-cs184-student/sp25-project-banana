@@ -47,7 +47,7 @@ static void init_debug_log() {
 
 // Define this to enable forced reflectance reduction for better visual appearance
 // Comment out to see raw thin film reflectance values
-//#define REDUCE_THINFILM_REFLECTANCE
+#define REDUCE_THINFILM_REFLECTANCE
 
 // Returns the RGB spectral primaries basis for a given wavelength (nm)
 static Vector3D spectral_primaries_basis(double lambda) {

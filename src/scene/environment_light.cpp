@@ -28,9 +28,13 @@ namespace CGL { namespace SceneObjects {
     // Store the marginal distribution for y to marginal_y
     // Store the conditional distribution for x given y to conds_y
 
+    // Brightness scaling factor to reduce HDR intensity
+    brightness_scale = 0.5; // Reduce brightness to 10% of original
+    
     double sum = 0;
     for (int j = 0; j < h; ++j) {
       for (int i = 0; i < w; ++i) {
+        // PDF calculation remains unchanged (not affecting final brightness)
         pdf_envmap[w * j + i] = envMap->data[w * j + i].illum() * sin(PI * (j + .5) / h);
         sum += pdf_envmap[w * j + i];
       }
@@ -134,7 +138,8 @@ namespace CGL { namespace SceneObjects {
     // Map direction to texture coordinates and bilinearly interpolate
     Vector2D theta_phi = dir_to_theta_phi(r.d);
     Vector2D xy = theta_phi_to_xy(theta_phi);
-    return bilerp(xy);
+    // Apply brightness scaling to the returned color to actually reduce the HDR brightness
+    return brightness_scale * bilerp(xy);
   }
 
 } // namespace SceneObjects

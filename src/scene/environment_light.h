@@ -50,6 +50,7 @@ private:
 
   void init();
   double* pdf_envmap, * marginal_y, * conds_y;
+  double brightness_scale;    // scaling factor for controlling HDR brightness
 
   Vector2D dir_to_theta_phi(const Vector3D dir) const;
   Vector3D theta_phi_to_dir(const Vector2D& theta_phi) const;

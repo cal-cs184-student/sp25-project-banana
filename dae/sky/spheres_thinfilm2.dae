@@ -84,7 +84,7 @@
             <roughness>0</roughness>
             <ior>1.7</ior>
             <base_ior>1.0</base_ior>
-            <thickness>500</thickness>
+            <thickness>5</thickness>
           </thinfilm>
         </technique>
       </extra>
