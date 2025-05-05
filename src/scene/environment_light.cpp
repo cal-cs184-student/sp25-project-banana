@@ -29,7 +29,7 @@ namespace CGL { namespace SceneObjects {
     // Store the conditional distribution for x given y to conds_y
 
     // Brightness scaling factor to reduce HDR intensity
-    brightness_scale = 0.5; // Reduce brightness to 10% of original
+    brightness_scale = 0.3; // Reduce brightness to 10% of original
     
     double sum = 0;
     for (int j = 0; j < h; ++j) {

@@ -47,7 +47,7 @@ static void init_debug_log() {
 
 // Define this to enable forced reflectance reduction for better visual appearance
 // Comment out to see raw thin film reflectance values
-#define REDUCE_THINFILM_REFLECTANCE
+//#define REDUCE_THINFILM_REFLECTANCE
 
 // Returns the RGB spectral primaries basis for a given wavelength (nm)
 static Vector3D spectral_primaries_basis(double lambda) {
@@ -252,7 +252,7 @@ double SpectralBSDF::airy_reflectance(const Vector3D& wo, double lambda, double 
   double sin_theta2 = n1/n2 * sin_theta1;
   if (sin_theta2 > 1.0) sin_theta2 = 1.0; // TIR guard
   double cos_theta2 = sqrt(1 - sin_theta2*sin_theta2);
-  double sin_theta3 = n1/n3 * sin_theta1;
+  double sin_theta3 = (n2/n3) * sin_theta2; // FIXED: correct Snell's law for n2->n3
   if (sin_theta3 > 1.0) sin_theta3 = 1.0;
   double cos_theta3 = sqrt(1 - sin_theta3*sin_theta3);
   
@@ -260,19 +260,13 @@ double SpectralBSDF::airy_reflectance(const Vector3D& wo, double lambda, double 
   double r12 = (n1*cos_theta1 - n2*cos_theta2) / (n1*cos_theta1 + n2*cos_theta2);
   double r23 = (n2*cos_theta2 - n3*cos_theta3) / (n2*cos_theta2 + n3*cos_theta3);
   
-  // Calculate phase shift - reduce thickness values to get more variation
-  double effective_thickness = thickness * 0.5; // Scale down for more visible effects
-  double phi = 4 * M_PI * effective_thickness * cos_theta2 / lambda;
-  
-  static int debug_counter = 0;
-  if (debug_counter++ % 10000 == 0) {
-    DEBUG_LOG("  r12=" << r12 << ", r23=" << r23 << ", phi=" << phi << ", cos(phi)=" << cos(phi));
-  }
-  
-  // Use modified formula that gives more reasonable reflectance
-  double numerator = r12*r12 + r23*r23 + 2*r12*r23*cos(phi);
-  double denominator = 1 + r12*r12*r23*r23 + 2*r12*r23*cos(phi);
+  double phi = 4.0 * M_PI * thickness * cos_theta2 / lambda; // no fudge factor, thickness in nm
+
+  double r12_2 = r12*r12, r23_2 = r23*r23;
+  double numerator   = r12_2 + r23_2 + 2.0*r12*r23*cos(phi);
+  double denominator = 1.0 + r12_2*r23_2 - 2.0*r12*r23*cos(phi); // sign fixed
   double R = numerator / denominator;
+  R = std::max(0.0, std::min(0.999, R)); // only clamp to avoid FP blow-ups
   
 #ifdef REDUCE_THINFILM_REFLECTANCE
   // Apply scaling factor to lower overall reflectance
@@ -295,16 +289,27 @@ double SpectralBSDF::airy_reflectance(const Vector3D& wo, double lambda, double 
 
 std::vector<double> SpectralBSDF::hero_sampler(double lambda_hero) {
   std::vector<double> samples;
-  // Sample 4 wavelengths around the hero (simple approach)
-  samples.push_back(lambda_hero);
-  samples.push_back(lambda_hero - 40);  // ~40nm lower
-  samples.push_back(lambda_hero + 40);  // ~40nm higher
-  samples.push_back(lambda_hero + 80);  // ~80nm higher
   
-  // Ensure wavelengths are in the visible range
-  for (size_t i = 0; i < samples.size(); i++) {
-    if (samples[i] < 380) samples[i] = 380;
-    if (samples[i] > 780) samples[i] = 780;
+  // Ensure hero wavelength is in our primary sampling range
+  lambda_hero = std::max(400.0, std::min(700.0, lambda_hero));
+  
+  // Add the hero wavelength first
+  samples.push_back(lambda_hero);
+  
+  // Add 9 more random samples distributed around the hero wavelength
+  // within a 300nm range (roughly 400-700nm visible spectrum)
+  const double range_width = 300.0;
+  const int num_samples = 19;  // 9 more for a total of 10
+  
+  for (int i = 0; i < num_samples; i++) {
+    // Create samples that vary by up to +/- 150nm from the hero
+    // using random distribution to better capture spectral detail
+    double offset = (random_uniform() * range_width) - (range_width/2.0);
+    double sample = lambda_hero + offset;
+    
+    // Ensure samples stay in visible range
+    sample = std::max(380.0, std::min(780.0, sample));
+    samples.push_back(sample);
   }
   
   return samples;
@@ -363,7 +368,8 @@ Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
     reflect(wo, wi);
     *pdf = R;
     if (should_debug) DEBUG_LOG("  REFLECT: pdf=" << *pdf);
-    return reflectance / abs_cos_theta(*wi);
+    Vector3D F = reflectance * R; // scale the colour mask by Fresnel R
+    return F / abs_cos_theta(*wi) / (*pdf); // correct energy balance
   } else if (base_bsdf && coin_flip(russian_roulette_prob)) {
     // Apply Russian roulette for recursive base material
     // Transmission to base material, use base BSDF
@@ -371,7 +377,8 @@ Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
     Vector3D f = base_bsdf->sample_f(wo, wi, &base_pdf);
     *pdf = (1 - R) * base_pdf * russian_roulette_prob;
     if (should_debug) DEBUG_LOG("  TRANSMIT TO BASE: pdf=" << *pdf);
-    return f * transmittance / russian_roulette_prob; // Compensate for RR probability
+    Vector3D F = transmittance * (1 - R); // scale by transmission probability
+    return f * F / russian_roulette_prob / (*pdf); // correct energy balance
   } else {
     // Simple refraction through the film
     double n = 0;
@@ -383,7 +390,8 @@ Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
     *pdf = 1 - R;
     double eta = wo.z > 0 ? 1/n : n;
     if (should_debug) DEBUG_LOG("  REFRACT: n=" << n << ", pdf=" << *pdf);
-    return transmittance / abs_cos_theta(*wi) / (eta*eta);
+    Vector3D F = transmittance * (1 - R);
+    return F / abs_cos_theta(*wi) / (eta*eta) / (*pdf); // correct energy balance
   }
 }
 

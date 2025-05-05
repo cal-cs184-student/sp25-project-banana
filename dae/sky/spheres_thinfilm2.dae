@@ -79,12 +79,12 @@
               The actual reflectance is determined by the thin film equations.
               Values are in RGB (0.8, 0.8, 0.8 = neutral gray at 80% intensity)
             -->
-            <reflectance>0.5 0.5 0.5</reflectance>
-            <transmittance>0.5 0.5 0.5</transmittance>
+            <reflectance>0.8 0.8 0.8</reflectance>
+            <transmittance>0.8 0.8 0.8</transmittance>
             <roughness>0</roughness>
-            <ior>1.7</ior>
+            <ior>1.33</ior>
             <base_ior>1.0</base_ior>
-            <thickness>5</thickness>
+            <thickness>1e-7</thickness>
           </thinfilm>
         </technique>
       </extra>
