@@ -4,6 +4,12 @@ layout: page
 nav_order: 3
 ---
 
+<script type="text/javascript"
+        id="MathJax-script"
+        async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
 # Spectra Final Project Page
 > Authors: Viktor Mooren, Ahsvin Verma, Curtis Hu, Toben Main
 
