@@ -21,7 +21,13 @@ Because the final output of a typical display is in RGB, the sampled wavelengths
 
 We should also note our decision to write our spectral segment as a BSDF instead of processing wavelengths throughout the rendering pipeline and doing an RGB conversion at the end. While this approach is viable and something that we saw in Dawson's paper on spectral ray tracing, we found a bit of difficulty trying to implement it. We figured we'd have to create a wavelength attribute for our rays and then find a way to propogate it throughout our system, but then we thought it would be difficult to work with these properties throughout our illuminance portions of the ray tracer. By calculating change in light at the surface of the object, we prevent having to rewrite the entire rendering pipeline to introduce spectral rendering, while also allowing us to maintain the properties of spectral ray tracing and additionally work within the realms of reflectance, transmittance, and refraction to produce thin films, bubbles, etc. Intuitively, we also liked the idea that the materials themselves carry the properties of having certain wavelengths of light associated with them, and they're also responsible for the way light interacts with them.
 
+# Someone who wrote the code edit this before submission
+
 Part 2: Thin Films:
+
+Thin-film interference arises due to multiple reflections inside the film (like in a bubble). The reflectance is computed using Airy's formula. Refraction indices n1, n2, and n3 represent air, the thin film, and the base material respectively. We calculate the phase difference using the film thickness and wavelength, which produces interference patterns. The probability of reflection or transmission is calculated using Fresnel's equations
+
+## Conclusion
 
 When doing this project, we learned not to invent the wheel. Initially, we considered either learning a new toolkit (PBRT) or craft a new ray tracer to create bubble/thin film rendering, but then we realized we had a good portion of the work already laid out for us in our homework 3. Utilizing resources and information other people have already tested and tried also came in handy. We were able to find various sources on XYZ and RGB conversions, as well as intricate details like the value of hero sampling, and implemented a new RNG for our hero sampling. We also used the same ray tracer as we did for our homework 3, so we were able to reuse the code for our ray tracer and our ray-object intersection functions.
 
@@ -43,12 +49,13 @@ There were a lot of issues, but we were able to get a working spectral implement
 
 ### Contributions
 #### Curtis Hu
-Documentation
+Documentation, Spectral Ray Tracer
 #### Viktor Mooren
 Putting video together
 #### Ashvin Verma
 Thin film rendering, images
 #### Toby Main
+Website, Presentation slides, Spectral Ray Tracer 
 
 
 
