@@ -23,7 +23,12 @@ We should also note our decision to write our spectral segment as a BSDF instead
 
 Part 2: Thin Films:
 
-When doing this project, we learned not to invent the wheel. Initially, we considered either learning a new toolkit (PBRT) or craft a new ray tracer to create bubble/thin film rendering, but then we realized we had a good portion of the work already laid out for us in our homework 3. Utilizing resources and information other people have already tested and tried also came in handy. We were able to find various sources on XYZ and RGB conversions, as well as intricate details like the value of hero sampling.
+When doing this project, we learned not to invent the wheel. Initially, we considered either learning a new toolkit (PBRT) or craft a new ray tracer to create bubble/thin film rendering, but then we realized we had a good portion of the work already laid out for us in our homework 3. Utilizing resources and information other people have already tested and tried also came in handy. We were able to find various sources on XYZ and RGB conversions, as well as intricate details like the value of hero sampling, and implemented a new RNG for our hero sampling. We also used the same ray tracer as we did for our homework 3, so we were able to reuse the code for our ray tracer and our ray-object intersection functions.
+
+There were a lot of issues, but we were able to get a working spectral implementation, albeit with higher general reflection and smaller transmission than we would've liked.
+
+
+![Thin Film Interference Example](images/experimental_thinfilm4.png)
 
 
 ## Results
