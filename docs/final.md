@@ -28,18 +28,22 @@ When doing this project, we learned not to invent the wheel. Initially, we consi
 There were a lot of issues, but we were able to get a working spectral implementation, albeit with higher general reflection and smaller transmission than we would've liked.
 
 
+## Results
+
 ![Thin Film Interference Example](images/experimental_thinfilm4.png)
 
 
-## Results
 
 
 ## References
 
 ### Contributions
 #### Curtis Hu
+Documentation
 #### Viktor Mooren
+Putting video together
 #### Ashvin Verma
+Thin film rendering, images
 #### Toby Main
 
 
