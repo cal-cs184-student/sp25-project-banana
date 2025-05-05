@@ -27,11 +27,52 @@ Because the final output of a typical display is in RGB, the sampled wavelengths
 
 We should also note our decision to write our spectral segment as a BSDF instead of processing wavelengths throughout the rendering pipeline and doing an RGB conversion at the end. While this approach is viable and something that we saw in Dawson's paper on spectral ray tracing, we found a bit of difficulty trying to implement it. We figured we'd have to create a wavelength attribute for our rays and then find a way to propogate it throughout our system, but then we thought it would be difficult to work with these properties throughout our illuminance portions of the ray tracer. By calculating change in light at the surface of the object, we prevent having to rewrite the entire rendering pipeline to introduce spectral rendering, while also allowing us to maintain the properties of spectral ray tracing and additionally work within the realms of reflectance, transmittance, and refraction to produce thin films, bubbles, etc. Intuitively, we also liked the idea that the materials themselves carry the properties of having certain wavelengths of light associated with them, and they're also responsible for the way light interacts with them.
 
-# Someone who wrote the code edit this before submission
-
 Part 2: Thin Films:
 
-Thin-film interference arises due to multiple reflections inside the film (like in a bubble). The reflectance is computed using Airy's formula. Refraction indices n1, n2, and n3 represent air, the thin film, and the base material respectively. We calculate the phase difference using the film thickness and wavelength, which produces interference patterns. The probability of reflection or transmission is calculated using Fresnel's equations
+Thin-film interference arises due to multiple reflections inside the film (like in a bubble). The idea is that when a ray hits the surface of a bubble, part of it bounces and part enters through the film. Then, inside the film, the ray partially bounces and partially enters through the bubble/other surface that the thin film covers. This interference on the two bounced portions leads to spectacular colors. 
+
+We calculate this reflection interference using Airy reflectance. Refraction indices n1, n2, and n3 represent air, the thin film, and the base material respectively. Given an incident angle θ_1, we compute the transmission angles using Snell’s law: 
+
+$$
+\sin\theta_2 = \frac{n_1}{n_2} \sin\theta_1
+$$
+
+$$
+\cos\theta_2 = \sqrt{1 - \sin^2\theta_2}
+$$
+
+$$
+\sin\theta_3 = \frac{n_2}{n_3} \sin\theta_2
+$$
+
+$$
+\cos\theta_3 = \sqrt{1 - \sin^2\theta_3}
+$$
+
+These equations dictate how the light bends as it enters and exits the thin films.
+
+As mentioned previously, we also have to account for the amount of waves that reflect vs. refract (which rays reflect and which ones proceed through the thin film). These are given by Fresnel's coeffecient equations:
+
+$$
+r_{12} = \frac{n_1 \cos\theta_1 - n_2 \cos\theta_2}{n_1 \cos\theta_1 + n_2 \cos\theta_2}
+$$
+
+$$
+r_{23} = \frac{n_2 \cos\theta_2 - n_3 \cos\theta_3}{n_2 \cos\theta_2 + n_3 \cos\theta_3}
+$$
+
+Which are coeffecients that tell us just how much of the light is reflected. This dictates to us whether we should have a ray bounce off of our bubble object or proceed to the next layer (where it may then bounce or proceed once again). From here, we shift the wavelength of our light ray to account for the aforementioned interference of the rays that bounce. This is denoted by the following equation:
+
+$$
+\phi = \frac{4\pi n_2 d \cos\theta_2}{\lambda}
+$$
+
+Which gives us how much the phase of our wave has shifted due to this transformation. Lastly, we use airy reflectance, what we brought up earlier, to check whether this interference is going to be constructive or destructive. Meaning, how strong is this reflection going to be, a mirror, or maybe the reflection isn't strong at all. Airy reflectance puts everything we previously talked about to form just how much reflectance is going on:
+
+$$
+R(\lambda, \theta_1, d) = \frac{r_{12}^2 + r_{23}^2 + 2 r_{12} r_{23} \cos(\phi)}{1 + r_{12}^2 r_{23}^2 - 2 r_{12} r_{23} \cos(\phi)}
+$$
+
 
 ## Conclusion
 
@@ -42,10 +83,14 @@ There were a lot of issues, but we were able to get a working spectral implement
 
 ## Results
 
-![Thin Film Interference Example](images/experimental_thinfilm4.png)
+![Thin Film Interference Example](../images/experimental_thinfilm4.png)
+
+![Thin Film Interference Example](../images/experimental_thinfilm5_2.png)
 
 
+## Video
 
+[![Spectra Project Video](https://img.youtube.com/vi/xnV4l0DKgbk/0.jpg)](https://youtu.be/xnV4l0DKgbk)
 
 ## References
 
