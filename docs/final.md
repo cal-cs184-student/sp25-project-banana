@@ -23,6 +23,12 @@ We should also note our decision to write our spectral segment as a BSDF instead
 
 Part 2: Thin Films:
 
+# Someone who wrote the code edit this before submission
+
+Thin-film interference arises due to multiple reflections inside the film (like in a bubble). The reflectance is computed using Airy's formula. Refraction indices n1, n2, and n3 represent air, the thin film, and the base material respectively. We calculate the phase difference using the film thickness and wavelength, which produces interference patterns. The probability of reflection or transmission is calculated using Fresnel's equations
+
+## Conclusion
+
 When doing this project, we learned not to invent the wheel. Initially, we considered either learning a new toolkit (PBRT) or craft a new ray tracer to create bubble/thin film rendering, but then we realized we had a good portion of the work already laid out for us in our homework 3. Utilizing resources and information other people have already tested and tried also came in handy. We were able to find various sources on XYZ and RGB conversions, as well as intricate details like the value of hero sampling, and implemented a new RNG for our hero sampling. We also used the same ray tracer as we did for our homework 3, so we were able to reuse the code for our ray tracer and our ray-object intersection functions.
 
 There were a lot of issues, but we were able to get a working spectral implementation, albeit with higher general reflection and smaller transmission than we would've liked.
@@ -39,12 +45,13 @@ There were a lot of issues, but we were able to get a working spectral implement
 
 ### Contributions
 #### Curtis Hu
-Documentation
+Documentation, Spectral Ray Tracer
 #### Viktor Mooren
 Putting video together
 #### Ashvin Verma
 Thin film rendering, images
 #### Toby Main
+Website, Presentation slides, Spectral Ray Tracer 
 
 
 
