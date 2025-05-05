@@ -323,98 +323,55 @@ Vector3D SpectralBSDF::f(const Vector3D wo, const Vector3D wi) {
 }
 
 Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
-  // Hero wavelength sampling - ensure good distribution across spectrum
-  double lambda = 380.0 + random_uniform() * (780.0 - 380.0);
-  std::vector<double> wavelengths = hero_sampler(lambda);
-  
-  // Debug: Print hero wavelength and samples - limit debug output
-  static int debug_count = 0;
-  bool should_debug = (debug_count < 5) && (random_uniform() < 0.001); // Only debug 0.1% of calls
-  
-  if (should_debug) {
-    debug_count++;
-    DEBUG_LOG("Hero λ: " << lambda << "nm, Samples: " 
-              << wavelengths[0] << "nm " 
-              << wavelengths[1] << "nm " 
-              << wavelengths[2] << "nm " 
-              << wavelengths[3] << "nm");
-  }
-  
-  // Calculate wavelength-dependent reflectance and convert to XYZ
-  Vector3D XYZ(0, 0, 0);
-  double R = 0;
-  
-  for (double l : wavelengths) {
-    if (should_debug) DEBUG_LOG("Computing reflectance for λ=" << l << "nm");
-    double r_l = airy_reflectance(wo, l, thickness);
-    R += r_l;
-    
-    // Convert to XYZ for each wavelength's reflectance
-    XYZ += CGL::ColorSpace::wave2xyz_table(l) * r_l;
-    
-    // Debug: Print reflectance for each wavelength
-    if (should_debug) DEBUG_LOG("  λ=" << l << "nm: R=" << r_l);
-  }
-  
-  R /= wavelengths.size();
-  XYZ /= wavelengths.size();
-  
-  // Convert XYZ to RGB
-  Vector3D rgb_reflectance = CGL::ColorSpace::xyz2rgb(XYZ);
-  
-#ifdef REDUCE_THINFILM_REFLECTANCE  
-  // Force reasonable reflectance values - lower the upper bound only if reduction is enabled
-  R = std::min(0.6, std::max(0.1, R));
-  
-  // Also apply to rgb values to avoid over-bright colors
-  rgb_reflectance.x = std::min(1.0, std::max(0.0, rgb_reflectance.x));
-  rgb_reflectance.y = std::min(1.0, std::max(0.0, rgb_reflectance.y));
-  rgb_reflectance.z = std::min(1.0, std::max(0.0, rgb_reflectance.z));
-#endif
-  
-  // Debug: Print average reflectance and RGB values
-  if (should_debug) {
-    DEBUG_LOG("  Avg R=" << R << ", film_ior=" << film_ior << ", thickness=" << thickness << "nm");
-    DEBUG_LOG("  RGB reflectance: (" << rgb_reflectance.x << ", " 
-              << rgb_reflectance.y << ", " << rgb_reflectance.z << ")");
-  }
-  
-  // Use Russian roulette for termination
-  double russian_roulette_prob = 0.9; // 90% chance to continue, 10% to terminate
-  
-  // Reflection or transmission based on probability
-  if (coin_flip(R)) {
-    reflect(wo, wi);
-    *pdf = R;
-    if (should_debug) DEBUG_LOG("  REFLECT: pdf=" << *pdf);
-    
-    // Use the spectral RGB reflectance instead of scaling by a flat R value
-    Vector3D F = reflectance * rgb_reflectance;
-    
-    return F / abs_cos_theta(*wi) / (*pdf); // correct energy balance
-  } else if (base_bsdf && coin_flip(russian_roulette_prob)) {
-    // Apply Russian roulette for recursive base material
-    // Transmission to base material, use base BSDF
-    double base_pdf;
-    Vector3D f = base_bsdf->sample_f(wo, wi, &base_pdf);
-    *pdf = (1 - R) * base_pdf * russian_roulette_prob;
-    if (should_debug) DEBUG_LOG("  TRANSMIT TO BASE: pdf=" << *pdf);
-    Vector3D F = transmittance * (1 - R); // scale by transmission probability
-    return f * F / russian_roulette_prob / (*pdf); // correct energy balance
-  } else {
-    // Simple refraction through the film
-    double n = 0;
-    for (double l : wavelengths) {
-      n += film_ior + 0.003/(l*l);
+    // (A) sample one hero wavelength and build mini-spectrum
+    const double λhero = 380.0 + random_uniform() * (780.0 - 380.0);
+    const auto λs = hero_sampler(λhero);
+    double invN = 1.0 / λs.size(), Ravg = 0.0;
+    Vector3D xyzR(0), xyzT(0);
+
+    for (double λ : λs) {
+        double Rλ = airy_reflectance(wo, λ, thickness);
+        Ravg += Rλ;
+        xyzR += CGL::ColorSpace::wave2xyz_table(λ) * Rλ;
+        xyzT += CGL::ColorSpace::wave2xyz_table(λ) * (1.0 - Rλ);
     }
-    n /= wavelengths.size();
-    refract(wo, wi, n);
-    *pdf = 1 - R;
-    double eta = wo.z > 0 ? 1/n : n;
-    if (should_debug) DEBUG_LOG("  REFRACT: n=" << n << ", pdf=" << *pdf);
-    Vector3D F = transmittance * (1 - R);
-    return F / abs_cos_theta(*wi) / (eta*eta) / (*pdf); // correct energy balance
-  }
+    Ravg *= invN;
+    Vector3D rgbR = CGL::ColorSpace::xyz2rgb(xyzR * invN);
+    Vector3D rgbT = CGL::ColorSpace::xyz2rgb(xyzT * invN);
+
+    // (B) decide reflect vs. transmit at film layer
+    if (coin_flip(Ravg)) {
+        Vector3D new_wi;
+        reflect(wo, &new_wi);
+        *pdf = Ravg;
+        *wi  = new_wi;
+        return reflectance * rgbR / (abs_cos_theta(new_wi) * (*pdf));
+    }
+
+    // (C1) refract into film
+    double nbar = 0.0;
+    for (double λ : λs) nbar += film_ior + 0.003/(λ*λ);
+    nbar *= invN;
+    Vector3D new_wi;
+    if (!refract(wo, &new_wi, nbar)) {
+        *pdf = 1.0;  
+        return Vector3D();   // TIR fallback
+    }
+    double Tavg = 1.0 - Ravg;
+
+    // (C2) sample underlying BSDF (or passthrough)
+    double base_pdf = 1.0;
+    Vector3D base_f(1,1,1);
+    if (base_bsdf) {
+        Vector3D wi_base;
+        base_f = base_bsdf->sample_f(new_wi, &wi_base, &base_pdf);
+        new_wi = wi_base;
+    }
+
+    // (C3) combine probabilities & throughput
+    *pdf = Tavg * base_pdf;
+    *wi  = new_wi;
+    return (transmittance * rgbT * base_f) / (*pdf);
 }
 
 Vector3D SpectralBSDF::sample_lambda() {

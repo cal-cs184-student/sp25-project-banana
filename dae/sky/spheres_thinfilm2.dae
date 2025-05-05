@@ -79,12 +79,13 @@
               The actual reflectance is determined by the thin film equations.
               Values are in RGB (0.8, 0.8, 0.8 = neutral gray at 80% intensity)
             -->
-            <reflectance>0.8 0.8 0.8</reflectance>
-            <transmittance>0.8 0.8 0.8</transmittance>
+            <reflectance>0.5 0.5 0.5</reflectance>
+            <transmittance>1.0 1.0 1.0</transmittance>
             <roughness>0</roughness>
             <ior>1.7</ior>
-            <base_ior>1.0</base_ior>
-            <thickness>600</thickness>
+            <base_ior>1.00</base_ior>
+            <thickness>500</thickness>
+            <!-- <base_material target="#myDiffusePaint"/> -->
           </thinfilm>
         </technique>
       </extra>
@@ -117,12 +118,12 @@
       <extra>
         <technique profile="CGL">
           <thinfilm>
-            <reflectance>0.8 0.8 0.8</reflectance>
-            <transmittance>0.8 0.8 0.8</transmittance>
+            <reflectance>0.5 0.5 0.5</reflectance>
+            <transmittance>1.0 1.0 1.0</transmittance>
             <roughness>0</roughness>
-            <ior>1.4</ior>
+            <ior>1.33</ior>
             <base_ior>1.0</base_ior>
-            <thickness>400</thickness>
+            <thickness>300</thickness>
           </thinfilm>
         </technique>
       </extra>
@@ -160,6 +161,39 @@
         </technique>
       </extra>
     </effect>
+    <effect id="myDiffusePaint-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.8 0.1 0.1 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0 0 0 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">1</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="CGL">
+          <lambertian>
+            <reflectance>0.8 0.1 0.1</reflectance>
+          </lambertian>
+        </technique>
+      </extra>
+    </effect>
   </library_effects>
   <library_materials>
     <material id="lambertian" name="lambertian">
@@ -170,6 +204,9 @@
     </material>
     <material id="light-material" name="light">
       <instance_effect url="#light-effect"/>
+    </material>
+    <material id="myDiffusePaint" name="myDiffusePaint">
+      <instance_effect url="#myDiffusePaint-effect"/>
     </material>
   </library_materials>
   <library_geometries>
@@ -187,6 +224,69 @@
         <technique profile="CGL">
           <sphere>
             <radius>.3</radius>
+          </sphere>
+        </technique>
+      </extra>
+    </geometry>
+    <geometry id="Sphere3-data" name="Sphere3">
+      <extra>
+        <technique profile="CGL">
+          <sphere>
+            <radius>.15</radius>
+          </sphere>
+        </technique>
+      </extra>
+    </geometry>
+    <geometry id="Sphere4-data" name="Sphere4">
+      <extra>
+        <technique profile="CGL">
+          <sphere>
+            <radius>.25</radius>
+          </sphere>
+        </technique>
+      </extra>
+    </geometry>
+    <geometry id="Sphere5-data" name="Sphere5">
+      <extra>
+        <technique profile="CGL">
+          <sphere>
+            <radius>.2</radius>
+          </sphere>
+        </technique>
+      </extra>
+    </geometry>
+    <geometry id="Sphere6-data" name="Sphere6">
+      <extra>
+        <technique profile="CGL">
+          <sphere>
+            <radius>.1</radius>
+          </sphere>
+        </technique>
+      </extra>
+    </geometry>
+    <geometry id="Sphere7-data" name="Sphere7">
+      <extra>
+        <technique profile="CGL">
+          <sphere>
+            <radius>.35</radius>
+          </sphere>
+        </technique>
+      </extra>
+    </geometry>
+    <geometry id="Sphere8-data" name="Sphere8">
+      <extra>
+        <technique profile="CGL">
+          <sphere>
+            <radius>.22</radius>
+          </sphere>
+        </technique>
+      </extra>
+    </geometry>
+    <geometry id="Sphere9-data" name="Sphere9">
+      <extra>
+        <technique profile="CGL">
+          <sphere>
+            <radius>.15</radius>
           </sphere>
         </technique>
       </extra>
@@ -209,9 +309,79 @@
           </bind_material>
         </instance_geometry>
       </node>
+      <node id="Sphere9" name="Sphere9" type="NODE">
+        <matrix sid="transform">1 0 0 -0.4 0 1 0 0.3 0 0 1 0.3 0 0 0 1</matrix>
+        <instance_geometry url="#Sphere9-data">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="lambertian" target="#lambertian"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
       <node id="Sphere2" name="Sphere2" type="NODE">
         <matrix sid="transform">1 0 0 0.4 0 1 0 -0.3 0 0 1 0.3 0 0 0 1</matrix>
-        <instance_geometry url="#Sphere1-data">
+        <instance_geometry url="#Sphere2-data">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="lambertian" target="#lambertian"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Sphere3" name="Sphere3" type="NODE">
+        <matrix sid="transform">1 0 0 1.2 0 1 0 0.5 0 0 1 0.5 0 0 0 1</matrix>
+        <instance_geometry url="#Sphere3-data">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="refract" target="#refract"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Sphere4" name="Sphere4" type="NODE">
+        <matrix sid="transform">1 0 0 -0.3 0 1 0 -1.4 0 0 1 0.2 0 0 0 1</matrix>
+        <instance_geometry url="#Sphere4-data">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="lambertian" target="#lambertian"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Sphere5" name="Sphere5" type="NODE">
+        <matrix sid="transform">1 0 0 0.6 0 1 0 1.1 0 0 1 0.7 0 0 0 1</matrix>
+        <instance_geometry url="#Sphere5-data">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="refract" target="#refract"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Sphere6" name="Sphere6" type="NODE">
+        <matrix sid="transform">1 0 0 -0.7 0 1 0 1.1 0 0 1 0.4 0 0 0 1</matrix>
+        <instance_geometry url="#Sphere6-data">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="lambertian" target="#lambertian"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Sphere7" name="Sphere7" type="NODE">
+        <matrix sid="transform">1 0 0 0.1 0 1 0 -1.6 0 0 1 0.6 0 0 0 1</matrix>
+        <instance_geometry url="#Sphere7-data">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="refract" target="#refract"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <node id="Sphere8" name="Sphere8" type="NODE">
+        <matrix sid="transform">1 0 0 -1.2 0 1 0 0.2 0 0 1 0.8 0 0 0 1</matrix>
+        <instance_geometry url="#Sphere8-data">
           <bind_material>
             <technique_common>
               <instance_material symbol="lambertian" target="#lambertian"/>
