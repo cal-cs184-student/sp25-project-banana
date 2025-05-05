@@ -93,7 +93,8 @@ There were a lot of issues, but we were able to get a working spectral implement
 
 ![Thin Film Interference Example](https://cal-cs184-student.github.io/sp25-project-banana/images/experimental_thinfilm5_2.png)
 
-
+<img src="../images/experimental_thinfilm4.png" alt="bubble" />
+<img src="../images/experimental_thinfilm5_2.png" alt="more bubbles" />
 
 
 ## Video
