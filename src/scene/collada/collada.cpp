@@ -926,6 +926,7 @@ void ColladaParser::parse_material ( XMLElement* xml, MaterialInfo& material ) {
           Vector3D reflectance = spectrum_from_string(string(e_reflectance->GetText()));
           float film_ior = atof(e_ior->GetText());
           float thickness = e_thickness ? atof(e_thickness->GetText()) : 500.0;
+          std::cout << "Thin film thickness = " << thickness << "\n";
           BSDF* base_bsdf = nullptr;
           double base_ior = e_base_ior ? atof(e_base_ior->GetText()) : 1.0;
           if (e_base_material) {

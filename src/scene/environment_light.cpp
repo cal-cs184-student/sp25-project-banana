@@ -5,6 +5,8 @@ namespace CGL { namespace SceneObjects {
 
   EnvironmentLight::EnvironmentLight(const HDRImageBuffer* envMap)
     : envMap(envMap) {
+    use_constant_color = false;
+    constant_color = Vector3D(1.0, 1.0, 1.0);
     init();
   }
 
@@ -135,11 +137,25 @@ namespace CGL { namespace SceneObjects {
   }
 
   Vector3D EnvironmentLight::sample_dir(const Ray& r) const {
-    // Map direction to texture coordinates and bilinearly interpolate
+    // If we're in constant color mode, just return the constant color
+    if (use_constant_color) {
+      return constant_color;
+    }
+    
+    // Otherwise, map direction to texture coordinates and bilinearly interpolate
     Vector2D theta_phi = dir_to_theta_phi(r.d);
     Vector2D xy = theta_phi_to_xy(theta_phi);
-    // Apply brightness scaling to the returned color to actually reduce the HDR brightness
+    // Apply brightness scaling to the returned color
     return brightness_scale * bilerp(xy);
+  }
+
+  void EnvironmentLight::set_constant_color(bool use_constant, const Vector3D& color) {
+    use_constant_color = use_constant;
+    constant_color = color;
+  }
+
+  void EnvironmentLight::set_brightness(double scale) {
+    brightness_scale = scale;
   }
 
 } // namespace SceneObjects

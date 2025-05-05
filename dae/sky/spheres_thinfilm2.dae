@@ -82,9 +82,9 @@
             <reflectance>0.8 0.8 0.8</reflectance>
             <transmittance>0.8 0.8 0.8</transmittance>
             <roughness>0</roughness>
-            <ior>1.33</ior>
+            <ior>1.7</ior>
             <base_ior>1.0</base_ior>
-            <thickness>1e-7</thickness>
+            <thickness>600</thickness>
           </thinfilm>
         </technique>
       </extra>
@@ -120,9 +120,9 @@
             <reflectance>0.8 0.8 0.8</reflectance>
             <transmittance>0.8 0.8 0.8</transmittance>
             <roughness>0</roughness>
-            <ior>1.33</ior>
+            <ior>1.4</ior>
             <base_ior>1.0</base_ior>
-            <thickness>300</thickness>
+            <thickness>400</thickness>
           </thinfilm>
         </technique>
       </extra>

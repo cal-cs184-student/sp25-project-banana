@@ -65,7 +65,7 @@ public:
    * Creates a new pathtracer instance.
    */
   RaytracedRenderer(size_t ns_aa = 1, 
-             size_t max_ray_depth = 4, bool is_accumulate_bounces =false, size_t ns_area_light = 1,
+             size_t max_ray_depth = 4, bool is_accumulate_bounces = false, size_t ns_area_light = 1,
              size_t ns_diff = 1, size_t ns_glsy = 1, size_t ns_refr = 1,
              size_t num_threads = 1,
              size_t samples_per_batch = 32,
@@ -74,7 +74,8 @@ public:
              bool direct_hemisphere_sample = false,
              string filename = "",
              double lensRadius = 0.25,
-             double focalDistance = 4.7);
+             double focalDistance = 4.7,
+             bool use_constant_env = false);
 
   /**
    * Destructor.

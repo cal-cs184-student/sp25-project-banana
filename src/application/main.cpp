@@ -35,6 +35,8 @@ void usage(const char *binaryName) {
   printf("  -m  <INT>        Maximum ray depth\n");
   printf("  -o  <INT>        Accumulate Bounces of Light \n");
   printf("  -e  <PATH>       Path to environment map\n");
+  printf("  -E  <INT>        Use constant environment (0 or 1), prevents environment map from drowning out interference\n");
+  printf("  -B  <FLOAT>      Brightness scale for environment map (default: 1.0)\n");
   printf("  -b  <FLOAT>      The size of the aperture\n");
   printf("  -d  <FLOAT>      The focal distance\n");
   printf("  -f  <FILENAME>   Image (.png) file to save output to in windowless "
@@ -147,7 +149,7 @@ int main(int argc, char **argv) {
       }
     }
   } else {
-    while ((opt = getopt(argc, argv, "s:l:t:m:o:e:h:H:f:r:c:b:d:a:p:")) !=
+    while ((opt = getopt(argc, argv, "s:l:t:m:o:e:E:h:H:f:r:c:b:d:a:p:")) !=
            -1) { // for each option...
       switch (opt) {
       case 'f':
@@ -185,6 +187,10 @@ int main(int argc, char **argv) {
         std::cout << "[PathTracer] Loading environment map " << optarg
                   << std::endl;
         config.pathtracer_envmap = load_exr(optarg);
+        break;
+      case 'E':
+        std::cout << "[PathTracer] Using constant environment: " << optarg << std::endl;
+        config.pathtracer_use_constant_env = atoi(optarg) > 0;
         break;
       case 'c':
         cam_settings = string(optarg);

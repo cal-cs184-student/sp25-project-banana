@@ -58,6 +58,7 @@ struct AppConfig {
 
     pathtracer_num_threads = 1;
     pathtracer_envmap = NULL;
+    pathtracer_use_constant_env = false;
 
     pathtracer_samples_per_patch = 32;
     pathtracer_max_tolerance = 0.05f;
@@ -79,6 +80,7 @@ struct AppConfig {
 
   size_t pathtracer_num_threads;
   HDRImageBuffer* pathtracer_envmap;
+  bool pathtracer_use_constant_env;  // Use constant environment instead of map
 
   float pathtracer_max_tolerance;
   size_t pathtracer_samples_per_patch;

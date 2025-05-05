@@ -293,6 +293,8 @@ std::vector<double> SpectralBSDF::hero_sampler(double lambda_hero) {
   // Ensure hero wavelength is in our primary sampling range
   lambda_hero = std::max(400.0, std::min(700.0, lambda_hero));
   
+  // std::cout << "Hero wavelength: " << lambda_hero << "nm" << std::endl;
+  
   // Add the hero wavelength first
   samples.push_back(lambda_hero);
   
@@ -338,26 +340,43 @@ Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
               << wavelengths[3] << "nm");
   }
   
-  // Average Airy reflectance across hero samples
+  // Calculate wavelength-dependent reflectance and convert to XYZ
+  Vector3D XYZ(0, 0, 0);
   double R = 0;
+  
   for (double l : wavelengths) {
     if (should_debug) DEBUG_LOG("Computing reflectance for λ=" << l << "nm");
     double r_l = airy_reflectance(wo, l, thickness);
     R += r_l;
     
+    // Convert to XYZ for each wavelength's reflectance
+    XYZ += CGL::ColorSpace::wave2xyz_table(l) * r_l;
+    
     // Debug: Print reflectance for each wavelength
     if (should_debug) DEBUG_LOG("  λ=" << l << "nm: R=" << r_l);
   }
+  
   R /= wavelengths.size();
+  XYZ /= wavelengths.size();
+  
+  // Convert XYZ to RGB
+  Vector3D rgb_reflectance = CGL::ColorSpace::xyz2rgb(XYZ);
   
 #ifdef REDUCE_THINFILM_REFLECTANCE  
   // Force reasonable reflectance values - lower the upper bound only if reduction is enabled
   R = std::min(0.6, std::max(0.1, R));
+  
+  // Also apply to rgb values to avoid over-bright colors
+  rgb_reflectance.x = std::min(1.0, std::max(0.0, rgb_reflectance.x));
+  rgb_reflectance.y = std::min(1.0, std::max(0.0, rgb_reflectance.y));
+  rgb_reflectance.z = std::min(1.0, std::max(0.0, rgb_reflectance.z));
 #endif
   
-  // Debug: Print average reflectance
+  // Debug: Print average reflectance and RGB values
   if (should_debug) {
     DEBUG_LOG("  Avg R=" << R << ", film_ior=" << film_ior << ", thickness=" << thickness << "nm");
+    DEBUG_LOG("  RGB reflectance: (" << rgb_reflectance.x << ", " 
+              << rgb_reflectance.y << ", " << rgb_reflectance.z << ")");
   }
   
   // Use Russian roulette for termination
@@ -368,7 +387,10 @@ Vector3D SpectralBSDF::sample_f(const Vector3D wo, Vector3D* wi, double* pdf) {
     reflect(wo, wi);
     *pdf = R;
     if (should_debug) DEBUG_LOG("  REFLECT: pdf=" << *pdf);
-    Vector3D F = reflectance * R; // scale the colour mask by Fresnel R
+    
+    // Use the spectral RGB reflectance instead of scaling by a flat R value
+    Vector3D F = reflectance * rgb_reflectance;
+    
     return F / abs_cos_theta(*wi) / (*pdf); // correct energy balance
   } else if (base_bsdf && coin_flip(russian_roulette_prob)) {
     // Apply Russian roulette for recursive base material
