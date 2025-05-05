@@ -1,7 +1,7 @@
 ---
-__layout__: home  
-__title__: Proposal  
-__nav_order__: 1  
+layout: home  
+title: Proposal  
+nav_order: 1  
 ---
 
 # __Spectra__
