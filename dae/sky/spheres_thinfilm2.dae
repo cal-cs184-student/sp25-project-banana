@@ -232,7 +232,7 @@
       <extra>
         <technique profile="CGL">
           <sphere>
-            <radius>.15</radius>
+            <radius>0.15</radius>
           </sphere>
         </technique>
       </extra>
@@ -241,7 +241,7 @@
       <extra>
         <technique profile="CGL">
           <sphere>
-            <radius>.25</radius>
+            <radius>0.25</radius>
           </sphere>
         </technique>
       </extra>
@@ -250,7 +250,7 @@
       <extra>
         <technique profile="CGL">
           <sphere>
-            <radius>.2</radius>
+            <radius>0.2</radius>
           </sphere>
         </technique>
       </extra>
@@ -259,34 +259,7 @@
       <extra>
         <technique profile="CGL">
           <sphere>
-            <radius>.1</radius>
-          </sphere>
-        </technique>
-      </extra>
-    </geometry>
-    <geometry id="Sphere7-data" name="Sphere7">
-      <extra>
-        <technique profile="CGL">
-          <sphere>
-            <radius>.35</radius>
-          </sphere>
-        </technique>
-      </extra>
-    </geometry>
-    <geometry id="Sphere8-data" name="Sphere8">
-      <extra>
-        <technique profile="CGL">
-          <sphere>
-            <radius>.22</radius>
-          </sphere>
-        </technique>
-      </extra>
-    </geometry>
-    <geometry id="Sphere9-data" name="Sphere9">
-      <extra>
-        <technique profile="CGL">
-          <sphere>
-            <radius>.15</radius>
+            <radius>0.28</radius>
           </sphere>
         </technique>
       </extra>
@@ -309,19 +282,9 @@
           </bind_material>
         </instance_geometry>
       </node>
-      <node id="Sphere9" name="Sphere9" type="NODE">
-        <matrix sid="transform">1 0 0 -0.4 0 1 0 0.3 0 0 1 0.3 0 0 0 1</matrix>
-        <instance_geometry url="#Sphere9-data">
-          <bind_material>
-            <technique_common>
-              <instance_material symbol="lambertian" target="#lambertian"/>
-            </technique_common>
-          </bind_material>
-        </instance_geometry>
-      </node>
       <node id="Sphere2" name="Sphere2" type="NODE">
         <matrix sid="transform">1 0 0 0.4 0 1 0 -0.3 0 0 1 0.3 0 0 0 1</matrix>
-        <instance_geometry url="#Sphere2-data">
+        <instance_geometry url="#Sphere1-data">
           <bind_material>
             <technique_common>
               <instance_material symbol="lambertian" target="#lambertian"/>
@@ -330,17 +293,17 @@
         </instance_geometry>
       </node>
       <node id="Sphere3" name="Sphere3" type="NODE">
-        <matrix sid="transform">1 0 0 1.2 0 1 0 0.5 0 0 1 0.5 0 0 0 1</matrix>
+        <matrix sid="transform">1 0 0 -0.4 0 1 0 0.3 0 0 1 0.3 0 0 0 1</matrix>
         <instance_geometry url="#Sphere3-data">
           <bind_material>
             <technique_common>
-              <instance_material symbol="refract" target="#refract"/>
+              <instance_material symbol="lambertian" target="#lambertian"/>
             </technique_common>
           </bind_material>
         </instance_geometry>
       </node>
       <node id="Sphere4" name="Sphere4" type="NODE">
-        <matrix sid="transform">1 0 0 -0.3 0 1 0 -1.4 0 0 1 0.2 0 0 0 1</matrix>
+        <matrix sid="transform">1 0 0 0.8 0 1 0 0.7 0 0 1 0.25 0 0 0 1</matrix>
         <instance_geometry url="#Sphere4-data">
           <bind_material>
             <technique_common>
@@ -350,17 +313,17 @@
         </instance_geometry>
       </node>
       <node id="Sphere5" name="Sphere5" type="NODE">
-        <matrix sid="transform">1 0 0 0.6 0 1 0 1.1 0 0 1 0.7 0 0 0 1</matrix>
+        <matrix sid="transform">1 0 0 -0.8 0 1 0 -0.6 0 0 1 0.2 0 0 0 1</matrix>
         <instance_geometry url="#Sphere5-data">
           <bind_material>
             <technique_common>
-              <instance_material symbol="refract" target="#refract"/>
+              <instance_material symbol="lambertian" target="#lambertian"/>
             </technique_common>
           </bind_material>
         </instance_geometry>
       </node>
       <node id="Sphere6" name="Sphere6" type="NODE">
-        <matrix sid="transform">1 0 0 -0.7 0 1 0 1.1 0 0 1 0.4 0 0 0 1</matrix>
+        <matrix sid="transform">1 0 0 0 0 1 0 0.8 0 0 1 0.28 0 0 0 1</matrix>
         <instance_geometry url="#Sphere6-data">
           <bind_material>
             <technique_common>
@@ -369,28 +332,8 @@
           </bind_material>
         </instance_geometry>
       </node>
-      <node id="Sphere7" name="Sphere7" type="NODE">
-        <matrix sid="transform">1 0 0 0.1 0 1 0 -1.6 0 0 1 0.6 0 0 0 1</matrix>
-        <instance_geometry url="#Sphere7-data">
-          <bind_material>
-            <technique_common>
-              <instance_material symbol="refract" target="#refract"/>
-            </technique_common>
-          </bind_material>
-        </instance_geometry>
-      </node>
-      <node id="Sphere8" name="Sphere8" type="NODE">
-        <matrix sid="transform">1 0 0 -1.2 0 1 0 0.2 0 0 1 0.8 0 0 0 1</matrix>
-        <instance_geometry url="#Sphere8-data">
-          <bind_material>
-            <technique_common>
-              <instance_material symbol="lambertian" target="#lambertian"/>
-            </technique_common>
-          </bind_material>
-        </instance_geometry>
-      </node>
       <node id="Camera" name="Camera" type="NODE">
-        <matrix sid="transform">-1 0 0 0 0 0 1 3 0 1 0 0 0 0 0 1</matrix>
+        <matrix sid="transform">-0.95 0.1 0 0 0 0.1 0.95 3.2 0.1 0.95 -0.1 0.2 0 0 0 1</matrix>
         <instance_camera url="#Camera-camera"/>
       </node>
     </visual_scene>
