@@ -89,9 +89,10 @@ There were a lot of issues, but we were able to get a working spectral implement
 
 ## Results
 
-![Thin Film Interference Example](../images/experimental_thinfilm4.png)
+![Thin Film Interference Example](/sp25-project-banana/images/experimental_thinfilm4.png)
 
-![Thin Film Interference Example](../images/experimental_thinfilm5_2.png)
+![Thin Film Interference Example](/sp25-project-banana/images/experimental_thinfilm5_2.png)
+
 
 
 ## Video
