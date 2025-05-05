@@ -30,10 +30,14 @@ There were a lot of issues, but we were able to get a working spectral implement
 
 ## Results
 
-![Thin Film Interference Example](images/experimental_thinfilm4.png)
+![Thin Film Interference Example](../images/experimental_thinfilm4.png)
+
+![Thin Film Interference Example](../images/experimental_thinfilm5_2.png)
 
 
+## Video
 
+[![Spectra Project Video](https://img.youtube.com/vi/xnV4l0DKgbk/0.jpg)](https://youtu.be/xnV4l0DKgbk)
 
 ## References
 
