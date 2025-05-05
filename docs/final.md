@@ -90,8 +90,9 @@ There were a lot of issues, but we were able to get a working spectral implement
 ## Results
 
 
-<img src="/assets/experimental_thinfilm3.png" alt="bubble" />
-<img src="/assets/experimental_thinfilm5_2.png" alt="more bubbles" />
+<img src="assets/experimental_thinfilm3.png" alt="Bubbles" />
+
+<img src="assets/experimental_thinfilm5_2.png" alt="More Bubbles" />
 
 
 ## Video
