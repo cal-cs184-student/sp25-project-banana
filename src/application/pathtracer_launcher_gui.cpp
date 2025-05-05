@@ -172,6 +172,20 @@ void PathtracerLauncherGUI::render_loop(GLFWwindow *a_window,
     }
     // For pathtracer_envmap, consider providing a file picker or similar method
     // for assignment.
+    
+    const int char_buf_size = 64;
+    static bool scene_file_exists = dae_exists(a_settings.scene_file_path);
+
+    {
+      ImGui::Separator();
+      Utils::title_text("Environment Map");
+      static char envmap_path_buf[char_buf_size];
+      strncpy(envmap_path_buf, a_settings.envmap_path.c_str(), char_buf_size);
+      if (ImGui::InputText("Environment Map (EXR)", envmap_path_buf, char_buf_size)) {
+        a_settings.envmap_path = envmap_path_buf;
+      }
+      Utils::HoverNote("Path to an HDR environment map in EXR format.\nExample: build/bloem_train_track_cloudy_4k.exr\nLeave empty for no environment map.");
+    }
 
     {
       ImGui::Separator();
@@ -181,8 +195,7 @@ void PathtracerLauncherGUI::render_loop(GLFWwindow *a_window,
           "Samples Per Patch",
           reinterpret_cast<int *>(&a_settings.pathtracer_samples_per_patch));
     }
-    const int char_buf_size = 64;
-    static bool scene_file_exists = dae_exists(a_settings.scene_file_path);
+
     {
       ImGui::Separator();
       Utils::title_text("Camera Settings");
@@ -438,6 +451,7 @@ void PathtracerLauncherGUI::GUISettings::serialize(
   file << output_file_name << "\n";
   file << cam_settings << "\n";
   file << scene_file_path << "\n";
+  file << envmap_path << "\n";
 
   file << settings_window_width << "\n";
   file << settings_window_height << "\n";
@@ -483,6 +497,7 @@ void PathtracerLauncherGUI::GUISettings::deserialize(
   std::getline(file, output_file_name);
   std::getline(file, cam_settings);
   std::getline(file, scene_file_path);
+  std::getline(file, envmap_path);
 
   file >> settings_window_width;
   file >> settings_window_height;

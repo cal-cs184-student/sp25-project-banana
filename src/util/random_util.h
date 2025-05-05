@@ -14,6 +14,7 @@ static std::mersenne_twister_engine<std::uint_fast32_t, 32, 624, 397, 31, 0x9908
 static double rmax = 1.0 / (minstd_engine.max() - minstd_engine.min());
 
 
+
 /**
  * Returns a number distributed uniformly over [0, 1].
  */

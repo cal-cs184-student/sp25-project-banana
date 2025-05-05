@@ -43,6 +43,10 @@ public:
     */
   Vector3D sample_dir(const Ray& r) const;
 
+  // New methods for controlling environment lighting
+  void set_constant_color(bool use_constant, const Vector3D& color = Vector3D(1.0, 1.0, 1.0));
+  void set_brightness(double scale);
+
 private:
   const HDRImageBuffer* envMap;
   UniformGridSampler2D sampler_uniform2d;
@@ -50,6 +54,11 @@ private:
 
   void init();
   double* pdf_envmap, * marginal_y, * conds_y;
+  double brightness_scale;    // scaling factor for controlling HDR brightness
+  
+  // New fields for constant environment mode
+  bool use_constant_color;
+  Vector3D constant_color;
 
   Vector2D dir_to_theta_phi(const Vector3D dir) const;
   Vector3D theta_phi_to_dir(const Vector2D& theta_phi) const;

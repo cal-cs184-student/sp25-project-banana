@@ -919,10 +919,26 @@ void ColladaParser::parse_material ( XMLElement* xml, MaterialInfo& material ) {
           XMLElement *e_transmittance  = get_element(e_bsdf, "transmittance");
           XMLElement *e_reflectance  = get_element(e_bsdf, "reflectance");
           XMLElement *e_ior = get_element(e_bsdf, "ior");
+          XMLElement *e_thickness = get_element(e_bsdf, "thickness");
+          XMLElement *e_base_ior = get_element(e_bsdf, "base_ior");
+          XMLElement *e_base_material = get_element(e_bsdf, "base_material");
           Vector3D transmittance = spectrum_from_string(string(e_transmittance->GetText()));
           Vector3D reflectance = spectrum_from_string(string(e_reflectance->GetText()));
-          float ior = atof(e_ior->GetText());
-          BSDF* bsdf = new SpectralBSDF(transmittance, reflectance, ior);
+          float film_ior = atof(e_ior->GetText());
+          float thickness = e_thickness ? atof(e_thickness->GetText()) : 500.0;
+          std::cout << "Thin film thickness = " << thickness << "\n";
+          BSDF* base_bsdf = nullptr;
+          double base_ior = e_base_ior ? atof(e_base_ior->GetText()) : 1.0;
+          if (e_base_material) {
+            string base_material_id = e_base_material->Attribute("target") + 1;
+            XMLElement* e_base = uri_find(base_material_id);
+            if (e_base) {
+              MaterialInfo* base_material = new MaterialInfo();
+              parse_material(e_base, *base_material);
+              base_bsdf = base_material->bsdf;
+            }
+          }
+          BSDF* bsdf = new SpectralBSDF(transmittance, reflectance, film_ior, thickness, base_ior, base_bsdf);
           material.bsdf = bsdf;
         }
         e_bsdf = e_bsdf->NextSiblingElement();

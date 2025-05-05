@@ -286,10 +286,10 @@
     </effect>
   </library_effects>
   <library_materials>
-    <material id="chrome" name="chrome">
-      <instance_effect url="#chrome-effect"/>
+    <material id="refract_one" name="refract">
+      <instance_effect url="#glass-effect"/>
     </material>
-    <material id="refract" name="refract">
+    <material id="refract_two" name="refract">
       <instance_effect url="#glass-effect"/>
     </material>
     <material id="ceiling-material" name="ceiling">
@@ -601,7 +601,7 @@
         <instance_geometry url="#Sphere1-data">
           <bind_material>
             <technique_common>
-              <instance_material symbol="refract" target="#refract"/>
+              <instance_material symbol="refract" target="#refract_one"/>
             </technique_common>
           </bind_material>
         </instance_geometry>
@@ -611,7 +611,7 @@
         <instance_geometry url="#Sphere1-data">
           <bind_material>
             <technique_common>
-              <instance_material symbol="chrome" target="#chrome"/>
+              <instance_material symbol="refract" target="#refract_two"/>
             </technique_common>
           </bind_material>
         </instance_geometry>

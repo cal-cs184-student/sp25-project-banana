@@ -1,6 +1,9 @@
 #ifndef CGL_APPLICATION_H
 #define CGL_APPLICATION_H
 
+// Include linux_types.h first to ensure the __u32, __u64, etc. types are defined
+#include "../util/linux_types.h"
+
 // STL
 #include <string>
 #include <iostream>
@@ -55,6 +58,7 @@ struct AppConfig {
 
     pathtracer_num_threads = 1;
     pathtracer_envmap = NULL;
+    pathtracer_use_constant_env = false;
 
     pathtracer_samples_per_patch = 32;
     pathtracer_max_tolerance = 0.05f;
@@ -76,6 +80,7 @@ struct AppConfig {
 
   size_t pathtracer_num_threads;
   HDRImageBuffer* pathtracer_envmap;
+  bool pathtracer_use_constant_env;  // Use constant environment instead of map
 
   float pathtracer_max_tolerance;
   size_t pathtracer_samples_per_patch;

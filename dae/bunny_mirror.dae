@@ -1,0 +1,43 @@
+<!-- Find the material section that looks something like this: -->
+<library_materials>
+  <material id="BunnyMaterial">
+    <!-- Change the existing material reference to point to a mirror effect: -->
+    <instance_effect url="#MirrorEffect"/>
+  </material>
+</library_materials>
+
+<library_effects>
+  <!-- Add a new mirror effect or modify an existing effect: -->
+  <effect id="MirrorEffect">
+    <profile_COMMON>
+      <technique sid="common">
+        <phong>
+          <!-- Define a high reflectivity with RGB values close to 1.0 -->
+          <reflective>
+            <color>0.95 0.95 0.95 1.0</color>
+          </reflective>
+          <reflectivity>
+            <float>1.0</float>
+          </reflectivity>
+          <!-- Reduce other components to minimize non-mirror-like behavior -->
+          <diffuse>
+            <color>0.0 0.0 0.0 1.0</color>
+          </diffuse>
+          <specular>
+            <color>1.0 1.0 1.0 1.0</color>
+          </specular>
+          <shininess>
+            <float>100.0</float>
+          </shininess>
+        </phong>
+      </technique>
+      <!-- Add a custom parameter that your renderer can use to identify this as a mirror material -->
+      <extra>
+        <technique profile="CGL">
+          <bsdf>mirror</bsdf>
+          <reflectance>0.95 0.95 0.95</reflectance>
+        </technique>
+      </extra>
+    </profile_COMMON>
+  </effect>
+</library_effects>

@@ -5,6 +5,8 @@ namespace CGL { namespace SceneObjects {
 
   EnvironmentLight::EnvironmentLight(const HDRImageBuffer* envMap)
     : envMap(envMap) {
+    use_constant_color = false;
+    constant_color = Vector3D(1.0, 1.0, 1.0);
     init();
   }
 
@@ -28,17 +30,17 @@ namespace CGL { namespace SceneObjects {
     // Store the marginal distribution for y to marginal_y
     // Store the conditional distribution for x given y to conds_y
 
+    // Brightness scaling factor to reduce HDR intensity
+    brightness_scale = 0.3; // Reduce brightness to 10% of original
+    
     double sum = 0;
     for (int j = 0; j < h; ++j) {
       for (int i = 0; i < w; ++i) {
+        // PDF calculation remains unchanged (not affecting final brightness)
         pdf_envmap[w * j + i] = envMap->data[w * j + i].illum() * sin(PI * (j + .5) / h);
         sum += pdf_envmap[w * j + i];
       }
     }
-
-
-
-
 
 
     if (true)
@@ -125,28 +127,35 @@ namespace CGL { namespace SceneObjects {
   Vector3D EnvironmentLight::sample_L(const Vector3D p, Vector3D* wi,
     double* distToLight,
     double* pdf) const {
-    // TODO: 3-2 Part 3 Tasks 2 and 3 (step 4)
-    // First implement uniform sphere sampling for the environment light
-    // Later implement full importance sampling
-
-    // Uniform
-    *wi = sampler_uniform_sphere.get_sample();
+    // Uniform sphere sampling for environment light
+    *wi = sampler_uniform_sphere.get_sample().unit();
     *distToLight = INF_D;
     *pdf = 1.0 / (4.0 * PI);
-
-
-
-
-    return Vector3D();
+    // Return radiance along sampled direction
+    Ray sample_ray(p, *wi);
+    return sample_dir(sample_ray);
   }
 
   Vector3D EnvironmentLight::sample_dir(const Ray& r) const {
-    // TODO: 3-2 Part 3 Task 1
-    // Use the helper functions to convert r.d into (x,y)
-    // then bilerp the return value
+    // If we're in constant color mode, just return the constant color
+    if (use_constant_color) {
+      return constant_color;
+    }
+    
+    // Otherwise, map direction to texture coordinates and bilinearly interpolate
+    Vector2D theta_phi = dir_to_theta_phi(r.d);
+    Vector2D xy = theta_phi_to_xy(theta_phi);
+    // Apply brightness scaling to the returned color
+    return brightness_scale * bilerp(xy);
+  }
 
-    return Vector3D();
+  void EnvironmentLight::set_constant_color(bool use_constant, const Vector3D& color) {
+    use_constant_color = use_constant;
+    constant_color = color;
+  }
 
+  void EnvironmentLight::set_brightness(double scale) {
+    brightness_scale = scale;
   }
 
 } // namespace SceneObjects

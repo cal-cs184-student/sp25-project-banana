@@ -47,7 +47,8 @@ RaytracedRenderer::RaytracedRenderer(size_t ns_aa,
                        bool direct_hemisphere_sample,
                        string filename,
                        double lensRadius,
-                       double focalDistance) {
+                       double focalDistance,
+                       bool use_constant_env) {
   state = INIT;
 
   pt = new PathTracer();
@@ -70,6 +71,12 @@ RaytracedRenderer::RaytracedRenderer(size_t ns_aa,
 
   if (envmap) {
     pt->envLight = new EnvironmentLight(envmap);
+    
+    // Enable constant environment mode if requested
+    if (use_constant_env) {
+      pt->envLight->set_constant_color(true, Vector3D(1.0, 1.0, 1.0));
+      fprintf(stdout, "[PathTracer] Using constant environment lighting (white) to isolate thin-film interference\n");
+    }
   } else {
     pt->envLight = NULL;
   }
